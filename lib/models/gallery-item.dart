@@ -23,7 +23,7 @@ class GalleryItem {
   });
 
   String id;
-  String? name;
+  String name;
   double? price;
   int? quantity;
   String? image;
