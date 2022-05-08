@@ -9,6 +9,7 @@ class GalleyWidget extends StatefulWidget {
 
   @override
   State<GalleyWidget> createState() => _GalleyWidgetState();
+
 }
 
 class _GalleyWidgetState extends State<GalleyWidget> {
