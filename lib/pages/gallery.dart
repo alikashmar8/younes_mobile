@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:younes_mobile/models/folder.dart';
-import 'package:younes_mobile/models/item.dart';
-import 'package:younes_mobile/services/folder.dart';
-import 'package:younes_mobile/services/items.dart';
+import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/services/gallery-items.dart';
 
 class GalleyWidget extends StatefulWidget {
   const GalleyWidget({Key? key}) : super(key: key);
@@ -12,11 +10,9 @@ class GalleyWidget extends StatefulWidget {
 }
 
 class _GalleyWidgetState extends State<GalleyWidget> {
-  List<Folder> folders = [];
-  List<Item> items = [];
+  List<GalleryItem> items = [];
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initializeData();
   }
@@ -25,15 +21,13 @@ class _GalleyWidgetState extends State<GalleyWidget> {
   Widget build(BuildContext context) {
     return Container(
       //TODO: create list of folders and items as gallery, you can get items from services
-      child: Text(folders.length.toString()),
+      child: Text(items.length.toString()),
     );
   }
 
   initializeData() async {
-    folders = await FoldersService.getFolders();
-    items = await ItemsService.getItems();
+    items = await GalleryItemsService.getGalleryItems();
     setState(() {
-      folders = folders;
       items = items;
     });
   }
