@@ -8,7 +8,7 @@ import 'package:younes_mobile/pages/auth/login.dart';
 import 'package:younes_mobile/pages/gallery.dart';
 import 'package:younes_mobile/pages/home.dart';
 
-const SERVER_IP = 'http://ip172-18-0-16-c9s3uck33d5g00b2pacg-3000.direct.labs.play-with-docker.com';
+const SERVER_IP = 'http://ip172-18-0-64-c9sit2s33d5g008makb0-3000.direct.labs.play-with-docker.com';
 final storage = FlutterSecureStorage();
 
 void main() {
