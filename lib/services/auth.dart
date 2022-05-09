@@ -20,6 +20,9 @@ class AuthService {
           "name": name,
           "role": "ADMIN"
         });
+    print('Sign up res code');
+    print(res.statusCode);
+    print(res.body);
     return res.statusCode;
   }
 }
