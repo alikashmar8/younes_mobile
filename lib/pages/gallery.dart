@@ -9,7 +9,6 @@ class GalleyWidget extends StatefulWidget {
 
   @override
   State<GalleyWidget> createState() => _GalleyWidgetState();
-
 }
 
 class _GalleyWidgetState extends State<GalleyWidget> {
@@ -88,51 +87,70 @@ class FileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(7),
-            child: Container(
-              width: 300,
-              height: 150,
-              padding: const EdgeInsets.all(10.0),
-              child: Card(
-                semanticContainer: true,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                elevation: 10,
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: Image.network(
-                        item.image.toString(),
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text(item.id),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(item.name),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(item.quantity.toString()),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+    return Container(
+      height: 50,
+      width: MediaQuery.of(context).size.width - 100,
+      padding: const EdgeInsets.fromLTRB(20, 5, 15, 5),
+      child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-        ],
+          elevation: 10,
+          child: SizedBox(
+            height: 400,
+            child: Column(
+              children: <Widget>[
+                Row(children: [
+                  const Padding(padding: EdgeInsets.all(8)),
+                  Image.network(
+                    item.image.toString(),
+                    fit: BoxFit.fill,
+                    height: 25,
+                    width: 25,
+                  ),
+                ]),
+                Row(children: [
+                  const Padding(padding: EdgeInsets.all(8)),
+                  Text(
+                    item.name,
+                    style: const TextStyle(fontSize: 13),
+                  )
+                ]),
+                Row(children: [
+                  const Padding(padding: EdgeInsets.all(8)),
+                  Text(
+                    "Quantity: " + item.quantity.toString(),
+                    style: const TextStyle(fontSize: 11),
+                  )
+                ]),
+                //    onTap: () {
+                //      Navigator.push(context, MaterialPageRoute(builder: (_) {
+                //        return DetailScreen(item);
+                //       }));
+                //     },
+                //   ),
+              ],
+            ),
+          )),
+    );
+  }
+}
+
+class DetailScreen extends StatelessWidget {
+  GalleryItem item;
+  DetailScreen(this.item);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GestureDetector(
+        child: Center(
+          child: Image.network(
+            item.image.toString(),
+          ),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
       ),
     );
   }
