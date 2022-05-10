@@ -2,12 +2,9 @@
 
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:younes_mobile/pages/gallery.dart';
 import 'package:younes_mobile/pages/home.dart';
-import 'package:younes_mobile/services/auth.dart';
+import 'package:younes_mobile/services/auth.service.dart';
 
 import '../../main.dart';
 
@@ -22,11 +19,11 @@ class LoginPage extends StatelessWidget {
             AlertDialog(title: Text(title), content: Text(text)),
       );
 
-  Future<int> attemptSignUp(String email, String password) async {
-    var res = await http.post(Uri.parse("$SERVER_IP/auth/register"),
-        body: {"email": email, "password": password});
-    return res.statusCode;
-  }
+  // Future<int> attemptSignUp(String email, String password) async {
+  //   var res = await http.post(Uri.parse("$SERVER_IP/auth/register"),
+  //       body: {"email": email, "password": password});
+  //   return res.statusCode;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +50,11 @@ class LoginPage extends StatelessWidget {
                     var password = _passwordController.text;
                     var res = await authService.attemptLogIn(email, password);
                     if (res != null) {
-                      var data = jsonDecode(res);
+                      var data = res;
                       var jwt = data['access_token'];
+                      // var user = data;
                       if (jwt != null) {
-                        storage.write(key: "jwt", value: jwt);
+                        storage.write(key: "access_token", value: jwt);
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -84,7 +82,8 @@ class LoginPage extends StatelessWidget {
                       displayDialog(context, "Invalid Password",
                           "The password should be at least 4 characters long");
                     else {
-                      var res = await authService.attemptSignUp(email, password, 'admin');
+                      var res = await authService.attemptSignUp(
+                          email, password, 'admin');
                       if (res == 201)
                         displayDialog(context, "Success",
                             "The user was created. Log in now.");

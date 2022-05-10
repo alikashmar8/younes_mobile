@@ -5,10 +5,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:younes_mobile/pages/auth/login.dart';
-import 'package:younes_mobile/pages/gallery.dart';
 import 'package:younes_mobile/pages/home.dart';
 
-const SERVER_IP = 'http://ip172-18-0-64-c9sit2s33d5g008makb0-3000.direct.labs.play-with-docker.com';
+
 final storage = FlutterSecureStorage();
 
 void main() {
@@ -17,7 +16,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   Future<String> get jwtOrEmpty async {
-    var jwt = await storage.read(key: "jwt");
+    var jwt = await storage.read(key: "access_token");
     if (jwt == null) return "";
     return jwt;
   }
@@ -34,7 +33,15 @@ class MyApp extends StatelessWidget {
       home: FutureBuilder(
           future: jwtOrEmpty,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return CircularProgressIndicator();
+            if (!snapshot.hasData)
+              // ignore: curly_braces_in_flow_control_structures
+              return Scaffold(
+                body: Expanded(
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                 ),
+                )
+              );
             if (snapshot.data != "") {
               var str = snapshot.data.toString();
               var jwt = str.split(".");

@@ -1,9 +1,19 @@
 // ignore_for_file: type_init_formals, use_key_in_widget_constructors, must_be_immutable, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/utils.dart';
+import 'package:younes_mobile/controllers/gallery-items.controller.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
+<<<<<<< HEAD
 import 'package:younes_mobile/services/gallery-items.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+=======
+import 'package:younes_mobile/services/gallery-items.service.dart';
+import 'package:younes_mobile/widgets/file-card.widget.dart';
+import 'package:younes_mobile/widgets/folder-card.widget.dart';
+>>>>>>> df5aacf0cc452c7ffb27deb4b80c07213c919c8a
 
 class GalleyWidget extends StatefulWidget {
   const GalleyWidget({Key? key}) : super(key: key);
@@ -13,15 +23,18 @@ class GalleyWidget extends StatefulWidget {
 }
 
 class _GalleyWidgetState extends State<GalleyWidget> {
-  List<GalleryItem> items = [];
+  // List<GalleryItem> items = [];
+  final GalleryItemsController _controller = Get.put(GalleryItemsController());
+
   @override
   void initState() {
     super.initState();
-    initializeData();
+    // initializeData();
   }
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return MaterialApp(
       home: Scaffold(
         floatingActionButton: SizedBox(
@@ -159,34 +172,38 @@ class FolderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+=======
+    return Scaffold(
+        body: Column(
+>>>>>>> df5aacf0cc452c7ffb27deb4b80c07213c919c8a
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 40),
-          child: ListTile(
-            onTap: () {},
-            leading: const SizedBox(
-              width: 50,
-              height: 30,
-              child: Icon(
-                Icons.folder,
-                size: 68,
-              ),
-            ),
-          ),
-        ),
-        Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(62, 24, 20, 0),
-              child: Text(item.name),
-            ),
-          ],
+        Expanded(
+          child: Obx(() {
+            if (_controller.isLoading.value) {
+              print("Loading...");
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return GridView.builder(
+                itemCount: _controller.itemsList.length,
+                itemBuilder: (context, index) =>
+                    _controller.itemsList[index].type == 'folder'
+                        ? FolderTile(_controller.itemsList[index])
+                        : FileTile(_controller.itemsList[index]),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 2,
+                ),
+              );
+            }
+          }),
         ),
       ],
-    );
+    ));
   }
-}
 
+<<<<<<< HEAD
 class FileTile extends StatelessWidget {
   GalleryItem item;
   FileTile(this.item);
@@ -237,6 +254,14 @@ class FileTile extends StatelessWidget {
           )),
     );
   }
+=======
+  // initializeData() async {
+  //   items = await GalleryItemsService.getGalleryItems();
+  //   setState(() {
+  //     items = items;
+  //   });
+  // }
+>>>>>>> df5aacf0cc452c7ffb27deb4b80c07213c919c8a
 }
 
 class DetailScreen extends StatelessWidget {
