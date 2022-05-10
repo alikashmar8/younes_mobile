@@ -7,6 +7,7 @@ import 'package:get/utils.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:younes_mobile/controllers/gallery-items.controller.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/widgets/dialogs.dart';
 import 'package:younes_mobile/widgets/file-card.widget.dart';
 import 'package:younes_mobile/widgets/folder-card.widget.dart';
 import 'package:spinner_input/spinner_input.dart';
@@ -23,107 +24,12 @@ class _GalleyWidgetState extends State<GalleyWidget> {
   final GalleryItemsController _controller = Get.put(GalleryItemsController());
   double spinner = 0;
 
+  bool tappedYes = false;
+
   @override
   void initState() {
     super.initState();
     // initializeData();
-  }
-void _showDialog() {
-    showDialog(
-              context: context,
-              builder: (context) => SingleChildScrollView(
-                controller: ModalScrollController.of(context),
-                child: Scaffold(
-                  body: Container(
-                      margin: EdgeInsets.fromLTRB(10, 10, 10, 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text("Name:",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
-                                  SizedBox(height: 10),
-                                  TextField(
-                                      decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
-                                  )),
-                                ]),
-                          ),
-                          Container(
-                            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Quantity:",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
-                                  SizedBox(height: 10),
-                                  SpinnerInput(
-                                    spinnerValue: spinner,
-                                    minValue: 0,
-                                    maxValue: 200,
-                                    onChange: (newValue) {
-                                      setState(() {
-                                        spinner = newValue;
-                                      });
-                                    },
-                                  ),
-                                ]),
-                          ),
-                          Container(
-                            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text("Description:",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
-                                  SizedBox(height: 10),
-                                  TextField(
-                                      maxLines: 3,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(),
-                                      )),
-                                ]),
-                          ),
-                          Container(
-                              margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    FloatingActionButton.extended(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      backgroundColor: Colors.blue[400],
-                                      label: Text(
-                                        "Cancel",
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    FloatingActionButton.extended(
-                                      onPressed: null,
-                                      backgroundColor: Colors.blue[400],
-                                      label: Text(
-                                        "Add",
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                  ])),
-                        ],
-                      )),
-                ),
-              ),
-            );
   }
 
   @override
@@ -134,7 +40,20 @@ void _showDialog() {
           width: 40,
           child: FloatingActionButton(
             backgroundColor: Colors.blue[500],
-            onPressed: _showDialog,
+            onPressed: () async {
+              final action = await ViewDialogs.addItemDialog(
+                context,
+                // 'Subscription',
+                // 'Waant to be notified about the '
+                //     'upcoming events and shows? Please subscribe to '
+                //     'our News Channel.',
+              );
+              // if (action == ViewDialogsAction.yes) {
+              //   setState(() => tappedYes = true);
+              // } else {
+              //   setState(() => tappedYes = false);
+              // }
+            },
             child: const Icon(
               Icons.add,
               size: 30,
