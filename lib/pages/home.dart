@@ -1,29 +1,39 @@
+// ignore_for_file: use_key_in_widget_constructors, no_logic_in_create_state
+
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:younes_mobile/common/api.service.dart';
+import 'package:younes_mobile/common/base-api.service.dart';
 
 import '../main.dart';
 import 'gallery.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage(this.jwt, this.payload);
+  const HomePage(this.jwt, this.payload);
 
-  factory HomePage.fromBase64(String jwt) => HomePage(
+  factory HomePage.fromBase64(String jwt) { 
+    print('jwt');
+    print(jwt);
+    var payload = json.decode(ascii.decode(base64.decode(base64.normalize(jwt.split(".")[1]))));
+    print('payload');
+    print(payload);
+    return HomePage(
       jwt,
-      json.decode(
-          ascii.decode(base64.decode(base64.normalize(jwt.split(".")[1])))));
-
+      payload);
+  }
   final String jwt;
   final Map<String, dynamic> payload;
 
   @override
-  State<HomePage> createState() => _MyHomePageState(this.jwt, this.payload);
+  State<HomePage> createState() => _MyHomePageState(jwt, payload);
 }
 
 class _MyHomePageState extends State<HomePage> {
   _MyHomePageState(this.jwt, this.payload);
+  final BaseApiService _baseApiService = ApiService();
 
   final String jwt;
   final Map<String, dynamic> payload;
@@ -33,8 +43,7 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return FutureBuilder(
-        future: http
-            .read(Uri.parse("$SERVER_IP/"), headers: {"Bearer": jwt}),
+        future: _baseApiService.getResponse('businesses', jwt),
         builder: (context, snapshot) => snapshot.hasData
             ? Scaffold(
                 appBar: AppBar(
@@ -131,7 +140,10 @@ class _MyHomePageState extends State<HomePage> {
                       ),
                     ),
                   )
-                : CircularProgressIndicator());
+                : const Scaffold(
+                    body: const Center(
+                    child: CircularProgressIndicator(),
+                  )));
   }
 
   List<IconData> listOfIcons = [
