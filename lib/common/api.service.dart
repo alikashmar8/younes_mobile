@@ -13,7 +13,7 @@ class ApiService extends BaseApiService {
   Future getResponse(String url, String access_token) async {
     dynamic responseJson;
     try {
-      final response = await http.get(Uri.parse(baseUrl + url), headers: {
+      final http.Response response = await http.get(Uri.parse(baseUrl + url), headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + access_token,
@@ -30,7 +30,7 @@ class ApiService extends BaseApiService {
     dynamic responseJson;
     try {
       print('sending request to:  ' +Uri.parse(baseUrl + url).toString());
-      final response =
+      final http.Response response =
           await http.post(Uri.parse(baseUrl + url), body: JsonBody);
       print('response: ' + response.toString());
       responseJson = returnResponse(response);
