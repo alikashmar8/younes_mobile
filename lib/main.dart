@@ -11,6 +11,8 @@ import 'package:younes_mobile/pages/home.dart';
 final storage = FlutterSecureStorage();
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -36,11 +38,9 @@ class MyApp extends StatelessWidget {
             if (!snapshot.hasData)
               // ignore: curly_braces_in_flow_control_structures
               return Scaffold(
-                body: Expanded(
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                 ),
-                )
+                body: const Center(
+                  child: CircularProgressIndicator(),
+                 )
               );
             if (snapshot.data != "") {
               var str = snapshot.data.toString();

@@ -7,6 +7,28 @@ import 'package:image_picker/image_picker.dart';
 enum ViewDialogsAction { yes, no }
 
 class ViewDialogs {
+  static Future<ViewDialogsAction?> showOkCancelDialog(
+    BuildContext context,
+    String title,
+    String message,
+  ) async {
+    final action = await showDialog<ViewDialogsAction>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+              child: Text('OK'), onPressed: () => Navigator.of(context).pop()),
+          FlatButton(
+              child: Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop()),
+        ],
+      ),
+    );
+    return action;
+  }
+
   static Future<void> addItemDialog(BuildContext context) async {
     double spinner = 0;
     File _image;
