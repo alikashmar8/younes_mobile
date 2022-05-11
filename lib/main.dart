@@ -45,7 +45,6 @@ class MyApp extends StatelessWidget {
             if (snapshot.data != "") {
               var str = snapshot.data.toString();
               var jwt = str.split(".");
-
               if (jwt.length != 3) {
                 return LoginPage();
               } else {
