@@ -15,6 +15,15 @@ class ViewDialogs {
       context: context,
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(builder: (context, setState) {
+        TextEditingController nameController = TextEditingController();
+        TextEditingController priceContorller = TextEditingController();
+        TextEditingController descriptionController = TextEditingController();
+        Map<String, dynamic> data = {
+          'Name': nameController.text,
+          'Price': priceContorller.text,
+          'Description': descriptionController.text,
+          'Quantity': spinner,
+        };
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -33,15 +42,17 @@ class ViewDialogs {
                 ),
               ],
             ),
-            const TextField(
-              decoration: InputDecoration(
+            TextFormField(
+              decoration: const InputDecoration(
                 labelText: 'Item Name',
               ),
+              controller: nameController,
             ),
-            const TextField(
-              decoration: InputDecoration(
+            TextFormField(
+              decoration: const InputDecoration(
                 labelText: 'Item Price',
               ),
+              controller: priceContorller,
             ),
             Padding(
               padding: EdgeInsets.only(top: 20),
@@ -52,7 +63,8 @@ class ViewDialogs {
                   ),
                   const SizedBox(width: 10),
                   SpinnerInput(
-                    middleNumberPadding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    middleNumberPadding:
+                        const EdgeInsets.fromLTRB(20, 0, 20, 0),
                     spinnerValue: spinner,
                     minValue: 0,
                     maxValue: 200,
@@ -65,10 +77,11 @@ class ViewDialogs {
                 ],
               ),
             ),
-            const TextField(
-              decoration: InputDecoration(
+            TextFormField(
+              decoration: const InputDecoration(
                 labelText: 'Item Description',
               ),
+              controller: descriptionController,
             ),
           ]),
           actions: <Widget>[
@@ -78,7 +91,7 @@ class ViewDialogs {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                print(data);
               },
               child: const Text('Add'),
             ),
