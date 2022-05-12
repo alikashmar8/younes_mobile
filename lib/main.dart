@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:younes_mobile/pages/auth/login.dart';
 import 'package:younes_mobile/pages/home.dart';
 
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'My Mobile',
       theme: ThemeData(
         primarySwatch: Colors.blue,

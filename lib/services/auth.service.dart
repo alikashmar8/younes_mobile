@@ -9,7 +9,7 @@ class AuthService {
       'email': email,
       'password': password,
     };
-    var response = await _baseApiService.postResponse('auth/login', body);
+    var response = await _baseApiService.postResponse('auth/login', body, null);
     print('response:');
     print(response);
     // print('response status: ' + response.statusCode.toString());
@@ -28,7 +28,7 @@ class AuthService {
       "role": "ADMIN"
     };
     var response =
-        await _baseApiService.postResponse('auth/register', body);
+        await _baseApiService.postResponse('auth/register', body, null);
     return response['status'];
   }
 
