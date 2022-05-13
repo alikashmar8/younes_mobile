@@ -51,20 +51,19 @@ class ApiService extends BaseApiService {
         title: 'No Internet Connection',
         content: const Text('Please check your internet connection'),
         confirm: FlatButton(
-          child: Text('Ok'),
+          child: const Text('Ok'),
           onPressed: () {
             Get.back();
           },
         ),
       );
       throw FetchDataException('No Internet Connection');
-    }
-    on HandshakeException {
+    } on HandshakeException {
       Get.defaultDialog(
         title: 'Server Error',
         content: const Text('Error communicating with server'),
         confirm: FlatButton(
-          child: Text('Ok'),
+          child: const Text('Ok'),
           onPressed: () {
             Get.back();
           },
@@ -76,24 +75,56 @@ class ApiService extends BaseApiService {
   }
 
   dynamic returnResponse(http.Response response) {
+    var body = jsonDecode(response.body);
+    String message = '';
+    if (body != null) {
+      message = body['message'];
+    } else {
+      message = 'Error';
+    }
     try {
       switch (response.statusCode) {
         case 201:
         case 200:
-          String responseapi = response.body.toString().replaceAll("\n", "");
-          var jsonsDataString = response.body.toString();
-          dynamic responseJson = jsonDecode(jsonsDataString);
+          dynamic responseJson = jsonDecode(body);
           return responseJson;
         case 400:
-          ViewDialogs.showMessageDialog('Bad Request', response.body);
+          Get.defaultDialog(
+            title: 'Bad Request',
+            content: Text(message),
+            confirm: FlatButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Get.back();
+              },
+            ),
+          );
           throw BadRequestException(response.body.toString());
         case 401:
         case 403:
-          ViewDialogs.showMessageDialog('Unauthorized', response.body);
+          Get.defaultDialog(
+            title: 'Unauthorized',
+            content: Text(message),
+            confirm: FlatButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Get.back();
+              },
+            ),
+          );
           throw UnauthorizedException(response.body.toString());
         case 404:
-          ViewDialogs.showMessageDialog('Request not found', response.body);
-          throw UnauthorizedException(response.body.toString());
+          Get.defaultDialog(
+            title: 'Not Found',
+            content: Text(message),
+            confirm: FlatButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Get.back();
+              },
+            ),
+          );
+          throw FetchDataException(response.body.toString());
         case 500:
         default:
           ViewDialogs.showMessageDialog(
@@ -110,12 +141,11 @@ class ApiService extends BaseApiService {
           onPressed: () {
             Get.back();
           },
-          child: Text('OK'),
+          child: const Text('OK'),
         ),
       );
-      throw FetchDataException(
-          'Unable to parse server response, ' +
-              ' with status code : ${response.statusCode}');
+      throw FetchDataException('Unable to parse server response, ' +
+          ' with status code : ${response.statusCode}');
     }
   }
 }
