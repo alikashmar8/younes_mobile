@@ -1,59 +1,57 @@
+// ignore_for_file: file_names, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
 
-class FileTile extends StatelessWidget {
+class FileCard extends StatelessWidget {
   GalleryItem item;
-  FileTile(this.item);
+  FileCard(this.item);
 
-  @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return Container(
-      height: 50,
-      width: MediaQuery.of(context).size.width - 100,
-      padding: const EdgeInsets.fromLTRB(20, 5, 15, 5),
-      child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          elevation: 10,
-          child: SizedBox(
-            height: 400,
+      margin: EdgeInsets.all(10),
+      child: SizedBox(
+          height: height * 0.3,
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            elevation: 20,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Row(children: [
-                  const Padding(padding: EdgeInsets.all(8)),
-                  Image.network(
-                    item.image.toString(),
-                    fit: BoxFit.fill,
-                    height: 25,
-                    width: 25,
-                  ),
-                ]),
-                Row(children: [
-                  const Padding(padding: EdgeInsets.all(8)),
-                  Text(
+                Stack(
+                  // ignore: prefer_const_literals_to_create_immutables
+                  children: <Widget>[
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15)),
+                      child: SizedBox(
+                        height: height * 0.2,
+                        width: double.infinity,
+                        child: Image.network(
+                          item.image.toString(),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
                     item.name,
-                    style: const TextStyle(fontSize: 13),
-                  )
-                ]),
-                Row(children: [
-                  const Padding(padding: EdgeInsets.all(8)),
-                  Text(
-                    "Quantity: " + item.quantity.toString(),
-                    style: const TextStyle(fontSize: 11),
-                  )
-                ]),
-                //    onTap: () {
-                //      Navigator.push(context, MaterialPageRoute(builder: (_) {
-                //        return DetailScreen(item);
-                //       }));
-                //     },
-                //   ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Price: ' + item.price.toString()),
+                )
               ],
             ),
           )),
     );
   }
 }
-

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
 
-class FolderTile extends StatelessWidget {
+class FolderCard extends StatelessWidget {
   GalleryItem item;
-  FolderTile(this.item);
+  FolderCard(this.item);
 
   @override
   Widget build(BuildContext context) {

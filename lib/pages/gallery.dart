@@ -10,7 +10,7 @@ import 'package:younes_mobile/common/base-api.service.dart';
 import 'package:younes_mobile/controllers/gallery-items.controller.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
 import 'package:younes_mobile/widgets/dialogs.dart';
-import 'package:younes_mobile/widgets/file-card-2.dart';
+import 'package:younes_mobile/widgets/file-card.widget.dart';
 import 'package:younes_mobile/widgets/file-card.widget.dart';
 import 'package:younes_mobile/widgets/folder-card.widget.dart';
 
@@ -83,60 +83,20 @@ class _GalleyWidgetState extends State<GalleyWidget> {
                         child: CircularProgressIndicator(),
                       );
                     } else {
-                      return AlignedGridView.count(crossAxisCount:  2, 
+                      return AlignedGridView.count(
+                        crossAxisCount: 2,
                         itemCount: _controller.itemsList.length,
-                          
-                       itemBuilder: 
-                            (BuildContext context, int index) {
-                              return _controller.itemsList[index].type == "folder"
-                                  ? FolderTile(
-                                      _controller.itemsList[index],
-                                    )
-                                  : FileCard(
-                                      _controller.itemsList[index],
-                                    );
-                            },
+                        itemBuilder: (BuildContext context, int index) {
+                          return _controller.itemsList[index].type == "folder"
+                              ? FolderCard(
+                                  _controller.itemsList[index],
+                                )
+                              : FileCard(
+                                  _controller.itemsList[index],
+                                );
+                        },
                       );
                     }
-                      //       staggeredTileBuilder: (int index) =>
-                      //           StaggeredTile.count(1, 1),
-                      //       mainAxisSpacing: 10,
-                      //       crossAxisSpacing: 10,
-                      //       padding: const EdgeInsets.all(10),
-                      //     );
-                      //  )
-                      // return StaggeredGrid.count(crossAxisCount: _controller.itemsList.length,
-                      //     mainAxisSpacing: 2, crossAxisSpacing: 4, children: [
-
-                      //   for (var item in _controller.itemsList.value)
-                      //     if (item.type == 'folder')
-                      //       FolderTile(
-                      //          item,
-                      //       )
-                      //     else
-                      //       FileTile(
-                      //         item,
-                      //       ),
-                            
-                        // for (var item in _controller.itemsList.value)
-                        //   if (!item.isFolder)
-                        //     FileTile(
-                        //       item
-                        //     ),
-                      // ]); 
-                    //   GridView.builder(
-                    //     itemCount: _controller.itemsList.length,
-                    //     itemBuilder: (context, index) =>
-                    //         _controller.itemsList[index].type == 'folder'
-                    //             ? FolderTile(_controller.itemsList[index])
-                    //             : FolderTile(_controller.itemsList[index]),
-                    //     gridDelegate:
-                    //         const SliverGridDelegateWithFixedCrossAxisCount(
-                    //       crossAxisCount: 2,
-                    //       childAspectRatio: 2,
-                    //     ),
-                    //   );
-                    // }
                   }),
                 ),
               ],
