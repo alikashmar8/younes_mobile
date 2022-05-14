@@ -86,7 +86,7 @@ class ApiService extends BaseApiService {
       switch (response.statusCode) {
         case 201:
         case 200:
-          dynamic responseJson = jsonDecode(body);
+          dynamic responseJson = body;
           return responseJson;
         case 400:
           Get.defaultDialog(

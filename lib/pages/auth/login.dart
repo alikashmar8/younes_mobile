@@ -52,7 +52,10 @@ class LoginPage extends StatelessWidget {
                     if (res != null) {
                       var data = res;
                       var jwt = data['access_token'];
-                      // var user = data;
+                      var user = data;
+                      if (data != null) {
+                        storage.write(key: 'user', value: json.encode(user));
+                      }
                       if (jwt != null) {
                         storage.write(key: "access_token", value: jwt);
                         Navigator.push(

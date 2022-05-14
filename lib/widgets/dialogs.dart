@@ -1,8 +1,12 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:spinner_input/spinner_input.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:younes_mobile/main.dart';
 
 enum ViewDialogsAction { yes, no }
 
@@ -19,9 +23,10 @@ class ViewDialogs {
         content: Text(message),
         actions: <Widget>[
           FlatButton(
-              child: Text('OK'), onPressed: () => Navigator.of(context).pop()),
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop()),
           FlatButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () => Navigator.of(context).pop()),
         ],
       ),
@@ -30,21 +35,25 @@ class ViewDialogs {
   }
 
   static Future<void> addItemDialog(BuildContext context) async {
-    double spinner = 0;
-    File _image;
+    // double spinner = 0;
+    File? _image;
+    String? user = await storage.read(key: 'user');
+    var business_id = json.decode(user!)['business_id'];
 
     final action = await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(builder: (context, setState) {
         TextEditingController nameController = TextEditingController();
-        TextEditingController priceContorller = TextEditingController();
+        TextEditingController priceController = TextEditingController();
         TextEditingController descriptionController = TextEditingController();
         Map<String, dynamic> data = {
-          'Name': nameController.text,
-          'Price': priceContorller.text,
-          'Description': descriptionController.text,
-          'Quantity': spinner,
+          'name': nameController.text,
+          'price': priceController.text,
+          'description': descriptionController.text,
+          'quantity': 1,
+          // 'image': _image,
+          'business_id': business_id,
         };
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -53,49 +62,81 @@ class ViewDialogs {
           title: const Text('Add Item'),
           content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
             Row(
-              children: const [
-                Text("Add an Image"),
-                SizedBox(width: 10),
+              children: [
+                const Text("Add an Image"),
+                const SizedBox(width: 10),
                 IconButton(
-                  icon: Icon(Icons.add_a_photo),
+                  icon: const Icon(Icons.add_a_photo),
                   iconSize: 30,
                   color: Colors.blue,
-                  onPressed: cameraImage,
+                  onPressed: () async {
+                    var image = await ImagePicker.pickImage(
+                      source: ImageSource.gallery,
+                      maxHeight: 240.0,
+                      maxWidth: 240.0,
+                    );
+                    setState(() {
+                      _image = image;
+                    });
+                  },
                 ),
               ],
             ),
             TextFormField(
               decoration: const InputDecoration(
-                labelText: 'Item Name',
+                labelText: 'Name',
               ),
               controller: nameController,
+              onChanged: (value) {
+                data['name'] = value;
+              },
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Name Cannot be empty!';
+                }
+              },
+              onSaved: (value) {
+                data['name'] = value;
+              },
             ),
             TextFormField(
               decoration: const InputDecoration(
-                labelText: 'Item Price',
+                labelText: 'Price',
               ),
-              controller: priceContorller,
+              keyboardType: TextInputType.number,
+              controller: priceController,
+              onChanged: (value) {
+                data['price'] = value;
+              },
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Price Cannot be empty!';
+                }
+              },
+              onSaved: (value) {
+                data['price'] = value;
+              },
             ),
             Padding(
-              padding: EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20),
               child: Row(
                 children: [
-                  const Text(
-                    "Item Quantity",
-                  ),
-                  const SizedBox(width: 10),
-                  SpinnerInput(
-                    middleNumberPadding:
-                        const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    spinnerValue: spinner,
-                    minValue: 0,
-                    maxValue: 200,
-                    onChange: (newValue) {
-                      setState(() {
-                        spinner = newValue;
-                      });
-                    },
-                  ),
+                  // const Text(
+                  //   "Item Quantity",
+                  // ),
+                  // const SizedBox(width: 10),
+                  // SpinnerInput(
+                  //   middleNumberPadding:
+                  //       const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  //   spinnerValue: spinner,
+                  //   minValue: 0,
+                  //   maxValue: 200,
+                  //   onChange: (newValue) {
+                  //     setState(() {
+                  //       spinner = newValue;
+                  //     });
+                  //   },
+                  // ),
                 ],
               ),
             ),
@@ -104,6 +145,12 @@ class ViewDialogs {
                 labelText: 'Item Description',
               ),
               controller: descriptionController,
+              onChanged: (value) {
+                data['description'] = value;
+              },
+              onSaved: (value) {
+                data['description'] = value;
+              },
             ),
           ]),
           actions: <Widget>[
@@ -113,6 +160,11 @@ class ViewDialogs {
             ),
             TextButton(
               onPressed: () {
+                print(data);
+                print('_image');
+                if (_image != null) {
+                  data['image'] = _image;
+                }
                 print(data);
               },
               child: const Text('Add'),
@@ -141,11 +193,5 @@ class ViewDialogs {
     );
   }
 
-  static Future<void> cameraImage() async {
-    var image = await ImagePicker.pickImage(
-      source: ImageSource.gallery,
-      maxHeight: 240.0,
-      maxWidth: 240.0,
-    );
-  }
+  static Future<void> cameraImage() async {}
 }

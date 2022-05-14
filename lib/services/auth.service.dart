@@ -9,6 +9,7 @@ class AuthService {
       'email': email,
       'password': password,
     };
+    print('attempting LogIn'+body.toString());
     var response = await _baseApiService.postResponse('auth/login', body, null);
     print('response:');
     print(response);
