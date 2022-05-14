@@ -15,6 +15,7 @@ class ViewDialogs {
     final action = await showDialog<ViewDialogsAction>(
       context: context,
       builder: (context) => AlertDialog(
+        
         title: Text(title),
         content: Text(message),
         actions: <Widget>[
