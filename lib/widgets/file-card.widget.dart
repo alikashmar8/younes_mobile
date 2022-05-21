@@ -7,6 +7,7 @@ class FileCard extends StatelessWidget {
   GalleryItem item;
   FileCard(this.item);
 
+  @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return Container(
@@ -29,7 +30,7 @@ class FileCard extends StatelessWidget {
                           topLeft: Radius.circular(15),
                           topRight: Radius.circular(15)),
                       child: SizedBox(
-                        height: height * 0.2,
+                        //height: height * 0.2,
                         width: double.infinity,
                         child: Image.network(
                           item.image.toString(),

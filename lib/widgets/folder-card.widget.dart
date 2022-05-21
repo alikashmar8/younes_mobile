@@ -10,32 +10,25 @@ class FolderCard extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     return Container(
       margin: const EdgeInsets.all(10),
-      child: SizedBox(
-        height: height * 0.2,
-        child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 20,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+           SizedBox(
+              width: height * 0.13,
+              child: const FittedBox(
+                child: Icon(
+                  Icons.folder_rounded,
+                  // size: 50,
+                ),
+              )),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-               SizedBox(
-                  width: height * 0.16,
-                  child: const FittedBox(
-                    child: Icon(
-                      Icons.folder_rounded,
-                      // size: 50,
-                    ),
-                  )),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(item.name),
-                ],
-              ),
+              Text(item.name),
             ],
           ),
-        ),
+        ],
       ),
     );
     

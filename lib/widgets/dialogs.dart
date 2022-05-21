@@ -1,12 +1,21 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_local_variable, avoid_init_to_null
 
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:spinner_input/spinner_input.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/main.dart';
+import 'package:younes_mobile/common/base-api.service.dart';
+import 'package:http/http.dart' as http;
+// hide MultipartFile;
+import 'package:dio/dio.dart';
+import 'dart:convert';
+
+import 'package:path/path.dart';
+import 'package:async/async.dart';
 
 enum ViewDialogsAction { yes, no }
 
@@ -19,7 +28,6 @@ class ViewDialogs {
     final action = await showDialog<ViewDialogsAction>(
       context: context,
       builder: (context) => AlertDialog(
-        
         title: Text(title),
         content: Text(message),
         actions: <Widget>[
@@ -38,6 +46,9 @@ class ViewDialogs {
   static Future<void> addItemDialog(BuildContext context) async {
     // double spinner = 0;
     File? _image;
+    File? imageFile = null;
+    final ImagePicker _picker = ImagePicker();
+
     String? user = await storage.read(key: 'user');
     var business_id = json.decode(user!)['business_id'];
 
@@ -53,7 +64,7 @@ class ViewDialogs {
           'price': priceController.text,
           'description': descriptionController.text,
           'quantity': 1,
-          // 'image': _image,
+          'type': 'item',
           'business_id': business_id,
         };
         return AlertDialog(
@@ -78,6 +89,7 @@ class ViewDialogs {
                     );
                     setState(() {
                       _image = image;
+                      imageFile = image;
                     });
                   },
                 ),
@@ -121,6 +133,7 @@ class ViewDialogs {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
+                // ignore: prefer_const_literals_to_create_immutables
                 children: [
                   // const Text(
                   //   "Item Quantity",
@@ -160,13 +173,125 @@ class ViewDialogs {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 print(data);
                 print('_image');
                 if (_image != null) {
                   data['image'] = _image;
                 }
-                print(data);
+                String access_token =
+                    await storage.read(key: 'access_token') ?? '';
+                var uri = Uri.parse(apiUrl + 'gallery-items/files');
+                var dio = Dio();
+                // ignore: deprecated_member_use
+                var stream =
+                    http.ByteStream(DelegatingStream.typed(_image!.openRead()));
+                // get file length
+                var length = await _image!.length();
+
+                // try {
+                  ///[1] CREATING INSTANCE
+                  var dioRequest = Dio();
+                  // dioRequest.options.baseUrl = '<YOUR-URL>';
+
+                  //[2] ADDING TOKEN
+                  dioRequest.options.headers = {
+                    'Authorization': 'Bearer $access_token',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  };
+
+                  // FORM DATA
+                String fileName = imageFile!.path.split('/').last;
+                FormData formData = FormData.fromMap({
+                  'image': await MultipartFile.fromFile(imageFile!.path, filename:fileName),   // change 'image' to the field name in your request
+                    'name': data['name'],  // you can send other data in request if required
+                    'price': data['price'],
+                    'description': data['description'],
+                    'quantity': data['quantity'].toString()
+                });
+                
+                var response = await dioRequest.post(
+                    uri.toString(),
+                    data: formData,
+                  );
+                  final result = json.decode(response.toString());
+                  print(result);
+                // } catch (err) {
+                //   print('ERROR  $err');
+                //   print(err);
+                // }
+
+                // BASE64
+                // read image bytes from disk as a list
+                // List<int> imageBytes = File(imageFile?.path ?? "").readAsBytesSync();
+                // convert that list to a string & encode the as base64 files
+                // String imageString = "data:image/jpeg;base64," + base64Encode(imageBytes);
+                // apiCall(imageString);
+
+
+                  //[3] ADDING EXTRA INFO
+                  // var formData = new FormData.fromMap({
+                  //   'name': data['name'],
+                  //   'price': data['price'],
+                  //   'description': data['description'],
+                  //   'quantity': data['quantity'].toString()
+                  // });
+
+                  //[4] ADD IMAGE TO UPLOAD
+                  var file = await MultipartFile.fromFile(
+                    _image!.path,
+                    filename: basename(_image!.path),
+                    // contentType: Dio().MediaType("image", basename(image.path))
+                  );
+
+                  // formData.files.add(MapEntry('image', file));
+
+                  //[5] SEND TO SERVER
+                //   var response = await dioRequest.post(
+                //     uri.toString(),
+                //     data: formData,
+                //   );
+                //   final result = json.decode(response.toString())['result'];
+                // } catch (err) {
+                //   print('ERROR  $err');
+                //   print(err);
+                // }
+
+                // var request = http.MultipartRequest("POST", uri);
+                // request.fields['name'] = data['name'];
+                // request.fields['price'] = data['price'];
+                // request.fields['description'] = data['description'];
+                // request.fields['quantity'] = data['quantity'].toString();
+                // request.files.add(await http.MultipartFile.fromPath(
+                //   'image',
+                //   _image!.path,
+                //   filename: basename(_image!.path),
+                // ));
+                // request.headers.addAll({
+                //   'Authorization': 'Bearer $access_token',
+                //   'Accept': 'application/json',
+                //   'Content-Type': 'application/x-www-form-urlencoded'
+                // });
+                // print(request.files);
+                // // var response = await dio.post(
+                // //   uri.toString(),
+                // //   data: request.fields,
+                // //   options: Options(
+                // //     headers: request.headers,
+                // //     method: 'POST',
+                // //   ),
+                // //   onSendProgress: (int sent, int total) {
+                // //     print((sent / total * 100).toStringAsFixed(0) + '%');
+                // //   },
+                // // );
+                // var res = await request.send();
+                // // .then((response) {
+                //   // if (response.statusCode == 200) print("Uploaded!");
+                //   print(res.statusCode);
+                //   var response = await http.Response.fromStream(res);
+                //   print(response.body);
+
+                // });
               },
               child: const Text('Add'),
             ),
