@@ -24,7 +24,16 @@ class FolderCard extends StatelessWidget {
               width: height * 0.13,
               child: InkWell(
                 onTap: () {
-                  Get.to(GalleryPage(item.id.toString()));
+                  print('going to parent: ${item.id}');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GalleryPage(
+                        item.id.toString(),
+                      ),
+                    ),
+                  );
+                  // Get.to(GalleryPage(item.id.toString()));
                   // callback(item.id.toString());
                 },
                 child: const FittedBox(

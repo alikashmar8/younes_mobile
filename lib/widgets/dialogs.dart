@@ -6,15 +6,18 @@ import 'dart:io';
 // hide MultipartFile;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
+import 'package:younes_mobile/common/api-endpoints.dart';
 import 'package:younes_mobile/common/api.constants.dart';
+import 'package:younes_mobile/common/api.service.dart';
 import 'package:younes_mobile/main.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 enum ViewDialogsAction { yes, no }
 
 class ViewDialogs {
+  static ApiService apiService = ApiService();
   static Future<ViewDialogsAction?> showOkCancelDialog(
     BuildContext context,
     String title,
@@ -293,5 +296,78 @@ class ViewDialogs {
     );
   }
 
-  static Future<void> cameraImage() async {}
+  static addFolderDialog(BuildContext context, String? parent_id) async {
+    TextEditingController nameController = TextEditingController();
+    var _formKey;
+    bool isLoading = false;
+    String errors = '';
+    String name = '';
+
+    final action = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => StatefulBuilder(builder: (context, setState) {
+              return AlertDialog(
+                title: const Text('Add Folder'),
+                content: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Folder Name',
+                        ),
+                        controller: nameController,
+                        onChanged: (value) {
+                          name = value;
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Name Cannot be empty!';
+                          }
+                        },
+                        onSaved: (value) {
+                          name = value!;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      setState(() {
+                        errors = '';
+                        isLoading = true;
+                      });
+                      if (nameController.text.isEmpty) {
+                        setState(() {
+                          errors = 'Please enter folder name';
+                          isLoading = false;
+                        });
+                        return;
+                      }
+                      var uri = Uri.parse(apiUrl + 'gallery-items/folders');
+                      await apiService
+                          .postResponse(galleryItemsEndpoint + 'folders', {
+                        'name': name,
+                        'parent_id': parent_id,
+                      }).then((response) {
+                        print('folder added');
+                        print(response);
+                        Navigator.of(context).pop(ViewDialogsAction.yes);
+                      });
+                    },
+                    child: const Text('Add'),
+                  )
+                ],
+              );
+            }));
+    return action;
+  }
 }

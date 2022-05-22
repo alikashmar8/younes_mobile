@@ -33,7 +33,7 @@ class ApiService extends BaseApiService {
   }
 
   @override
-  Future postResponse(String url, Map<String, String> JsonBody) async {
+  Future postResponse(String url, Map<String, String?> JsonBody) async {
     String access_token = await storage.read(key: 'access_token') ?? '';
     dynamic responseJson;
     Map<String, String> headers = {
