@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/pages/gallery.dart';
+
+typedef void StringCallback(String val);
 
 class FolderCard extends StatelessWidget {
   GalleryItem item;
-  FolderCard(this.item);
+  // Call back not used for now
+  final StringCallback callback;
+  FolderCard({required this.item, required this.callback});
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +20,18 @@ class FolderCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-           SizedBox(
+          SizedBox(
               width: height * 0.13,
-              child: const FittedBox(
-                child: Icon(
-                  Icons.folder_rounded,
-                  // size: 50,
+              child: InkWell(
+                onTap: () {
+                  Get.to(GalleryPage(item.id.toString()));
+                  // callback(item.id.toString());
+                },
+                child: const FittedBox(
+                  child: Icon(
+                    Icons.folder_rounded,
+                    // size: 50,
+                  ),
                 ),
               )),
           Row(
@@ -31,6 +43,5 @@ class FolderCard extends StatelessWidget {
         ],
       ),
     );
-    
   }
 }

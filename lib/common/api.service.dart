@@ -5,18 +5,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/common/custom-exceptions.dart';
+import 'package:younes_mobile/main.dart';
 import 'package:younes_mobile/widgets/dialogs.dart';
 
 import 'base-api.service.dart';
 
 class ApiService extends BaseApiService {
   @override
-  Future getResponse(String url, String access_token) async {
+  Future getResponse(String url) async {
+    String access_token = await storage.read(key: 'access_token') ?? '';
     dynamic responseJson;
     try {
       final http.Response response =
-          await http.get(Uri.parse(baseUrl + url), headers: {
+          await http.get(Uri.parse(apiUrl + url), headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json',
         'Charset': 'utf-8',
@@ -30,19 +33,17 @@ class ApiService extends BaseApiService {
   }
 
   @override
-  Future postResponse(
-      String url, Map<String, String> JsonBody, String? access_token) async {
+  Future postResponse(String url, Map<String, String> JsonBody) async {
+    String access_token = await storage.read(key: 'access_token') ?? '';
     dynamic responseJson;
     Map<String, String> headers = {
       'Content-Type': 'application/json;charset=UTF-8',
       'Accept': 'application/json',
       'Charset': 'utf-8',
     };
-    if (access_token != null) {
-      headers['Authorization'] = 'Bearer ' + access_token;
-    }
+    headers['Authorization'] = 'Bearer ' + access_token;
     try {
-      final http.Response response = await http.post(Uri.parse(baseUrl + url),
+      final http.Response response = await http.post(Uri.parse(apiUrl + url),
           headers: headers, body: jsonEncode(JsonBody));
       print('response.body.toString: ' + response.body.toString());
       responseJson = returnResponse(response);
@@ -77,7 +78,7 @@ class ApiService extends BaseApiService {
   dynamic returnResponse(http.Response response) {
     var body = jsonDecode(response.body);
     String message = '';
-    if (body != null) {
+    if (body != null && response.statusCode > 299) {
       message = body['message'];
     } else {
       message = 'Error';

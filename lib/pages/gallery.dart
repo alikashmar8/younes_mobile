@@ -1,52 +1,44 @@
-// ignore_for_file: type_init_formals, use_key_in_widget_constructors, must_be_immutable, prefer_const_constructors
+// ignore_for_file: type_init_formals, use_key_in_widget_constructors, must_be_immutable, prefer_const_constructors, non_constant_identifier_names, unused_field
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/utils.dart';
-import 'package:younes_mobile/common/api.service.dart';
-import 'package:younes_mobile/common/base-api.service.dart';
-import 'package:younes_mobile/controllers/gallery-items.controller.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/services/gallery-items.service.dart';
 import 'package:younes_mobile/widgets/dialogs.dart';
-import 'package:younes_mobile/widgets/file-card.widget.dart';
 import 'package:younes_mobile/widgets/file-card.widget.dart';
 import 'package:younes_mobile/widgets/folder-card.widget.dart';
 
-class GalleyWidget extends StatefulWidget {
-  // const GalleyWidget({Key? key}) : super(key: key);
-  var jwt;
-  var payload;
-
-  GalleyWidget(String jwt) {
-    this.jwt = jwt;
-  }
+class GalleryPage extends StatefulWidget {
+  String? parent_id;
+  GalleryPage(this.parent_id);
 
   @override
-  State<GalleyWidget> createState() => _GalleyWidgetState(jwt);
+  State<StatefulWidget> createState() => GalleyWidgetState(parent_id);
+
+  static GalleyWidgetState? of(BuildContext context) =>
+      context.findAncestorStateOfType<GalleyWidgetState>();
 }
 
-class _GalleyWidgetState extends State<GalleyWidget> {
-  // List<GalleryItem> items = [];
-  _GalleyWidgetState(this.jwt);
-  var jwt;
-  bool isLoading = true;
-  final GalleryItemsController _controller = Get.put(GalleryItemsController());
-  final BaseApiService _baseApiService = ApiService();
+class GalleyWidgetState extends State<GalleryPage> {
+  List<GalleryItem> items = [];
 
-  bool tappedYes = false;
+  String _string = '';
+  GalleyWidgetState(this.parent_id);
+  String? parent_id;
+  final GalleryItemsService _galleryItemsService = GalleryItemsService();
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    initializeData();
+    getItems();
   }
 
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? Center(child: SpinKitSpinningLines(color: Colors.blue))
         : Scaffold(
             floatingActionButton: SizedBox(
               height: 40,
@@ -56,16 +48,17 @@ class _GalleyWidgetState extends State<GalleyWidget> {
                 onPressed: () async {
                   final action = await ViewDialogs.addItemDialog(
                     context,
-                    // 'Subscription',
-                    // 'Waant to be notified about the '
-                    //     'upcoming events and shows? Please subscribe to '
-                    //     'our News Channel.',
+                    parent_id,
                   );
-                  // if (action == ViewDialogsAction.yes) {
-                  //   setState(() => tappedYes = true);
-                  // } else {
-                  //   setState(() => tappedYes = false);
-                  // }
+                  print('action:');
+                  print(action);
+                  if (action == ViewDialogsAction.yes) {
+                    setState(() {
+                      isLoading = true;
+                      items = [];
+                    });
+                    getItems();
+                  }
                 },
                 child: const Icon(
                   Icons.add,
@@ -73,57 +66,42 @@ class _GalleyWidgetState extends State<GalleyWidget> {
                 ),
               ),
             ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: Obx(() {
-                    if (_controller.isLoading.value) {
-                      print("Loading...");
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else {
-                      return AlignedGridView.count(
-                        crossAxisCount: 2,
-                        itemCount: _controller.itemsList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return _controller.itemsList[index].type == "folder"
-                              ? FolderCard(
-                                  _controller.itemsList[index],
-                                )
-                              : FileCard(
-                                  _controller.itemsList[index],
-                                );
-                        },
-                      );
-                    }
-                  }),
-                ),
-              ],
-            ));
+            body: items.isEmpty
+                ? Center(
+                    child: Text(
+                      'No items found!',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : Column(children: [
+                    Expanded(
+                        child: AlignedGridView.count(
+                      crossAxisCount: 2,
+                      itemCount: items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return items[index].type == "folder"
+                            ? FolderCard(
+                                item: items[index],
+                                callback: (val) {
+                                  print(val);
+                                  setState(() => _string = val);
+                                })
+                            : FileCard(
+                                items[index],
+                              );
+                      },
+                    ))
+                  ]),
+          );
   }
 
-  void initializeData() {
-    _baseApiService.getResponse('businesses', jwt).then((galleries) {
+  void getItems() {
+    _galleryItemsService.getGalleryItems(parent_id).then((value) {
       setState(() {
-        isLoading = false;
-      });
-    }).catchError((error) {
-      print('error catched');
-      setState(() {
-        print(error.toString());
-        Get.defaultDialog(
-          title: 'Error',
-          content: Text(error.toString()),
-          actions: [
-            FlatButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: Text('Ok'),
-            ),
-          ],
-        );
+        items = value;
         isLoading = false;
       });
     });

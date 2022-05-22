@@ -2,7 +2,8 @@
 
 import 'dart:convert';
 
-GalleryItem galleryItemFromJson(String str) => GalleryItem.fromJson(json.decode(str));
+GalleryItem galleryItemFromJson(String str) =>
+    GalleryItem.fromJson(json.decode(str));
 
 String galleryItemToJson(GalleryItem data) => json.encode(data.toJson());
 
@@ -22,25 +23,25 @@ class GalleryItem {
     this.updatedById,
   });
 
-  String id;
+  int id;
   String name;
   double? price;
   int? quantity;
   String? image;
-  String? parentId;
+  int? parentId;
   String type;
   String? description;
   bool isActive;
-  String businessId;
-  String createdById;
-  String? updatedById;
+  int businessId;
+  int createdById;
+  int? updatedById;
 
   factory GalleryItem.fromJson(Map<String, dynamic> json) => GalleryItem(
         id: json["id"],
         name: json["name"],
-        price: json["price"] ? json['price'].toDouble(): null,
-        quantity: json["quantity"]? json['quantity']: null,
-        image: json["image"] ? json["image"] : null,
+        price: json['price'].toDouble(),
+        quantity: json['quantity'],
+        image: json["image"],
         parentId: json["parent_id"],
         type: json["type"],
         description: json["description"],

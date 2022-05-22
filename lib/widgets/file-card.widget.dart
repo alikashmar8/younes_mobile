@@ -1,15 +1,17 @@
-// ignore_for_file: file_names, prefer_const_constructors
+// ignore_for_file: file_names, prefer_const_constructors, must_be_immutable, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
 
 class FileCard extends StatelessWidget {
   GalleryItem item;
   FileCard(this.item);
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     return Container(
       margin: EdgeInsets.all(10),
       child: SizedBox(
@@ -30,14 +32,60 @@ class FileCard extends StatelessWidget {
                           topLeft: Radius.circular(15),
                           topRight: Radius.circular(15)),
                       child: SizedBox(
-                        //height: height * 0.2,
+                        height: height * 0.17,
                         width: double.infinity,
                         child: Image.network(
-                          item.image.toString(),
+                          baseUrl + item.image.toString(),
                           fit: BoxFit.fill,
+                          color: item.quantity! < 1
+                              ? Colors.black.withOpacity(0.5)
+                              : null,
+                          colorBlendMode: BlendMode.darken,
                         ),
                       ),
-                    )
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        margin: EdgeInsets.only(right: 5, top: 5),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.favorite_outline,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            print('make favorite');
+                          },
+                        ),
+                      ),
+                    ),
+                    item.quantity! < 1
+                        ? Align(
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              margin: EdgeInsets.only(top: height * 0.01),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                // ignore: prefer_const_literals_to_create_immutables
+                                children: <Widget>[
+                                  FittedBox(
+                                    child: Icon(
+                                      Icons.block,
+                                      color: Colors.red,
+                                      size: width * 0.3,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Out of stock',
+                                    style: TextStyle(
+                                        fontSize: 15, color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Container()
                   ],
                 ),
                 Padding(

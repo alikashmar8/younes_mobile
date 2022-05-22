@@ -31,7 +31,7 @@ class HomePage extends StatefulWidget {
 class _MyHomePageState extends State<HomePage> {
   _MyHomePageState(this.jwt, this.payload) {
     listOfWidgets = [
-      GalleyWidget(jwt),
+      GalleryPage(null),
       const Text('page 2'),
       const Text('page 3'),
       const Text('page 4'),
