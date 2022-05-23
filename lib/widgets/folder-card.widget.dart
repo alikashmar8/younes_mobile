@@ -17,7 +17,16 @@ class FolderCard extends StatelessWidget {
     return Scaffold(
                body:  GestureDetector(
                 onTap: () {
-                  Get.to(GalleryPage(item.id.toString()));
+                  print('going to parent: ${item.id}');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GalleryPage(
+                        item.id.toString(),
+                      ),
+                    ),
+                  );
+                  // Get.to(GalleryPage(item.id.toString()));
                   // callback(item.id.toString());
                 },
                 child: const FittedBox(

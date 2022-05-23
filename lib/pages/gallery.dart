@@ -1,6 +1,7 @@
 // ignore_for_file: type_init_formals, use_key_in_widget_constructors, must_be_immutable, prefer_const_constructors, non_constant_identifier_names, unused_field
 
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
@@ -40,32 +41,34 @@ class GalleyWidgetState extends State<GalleryPage> {
     return isLoading
         ? Center(child: SpinKitSpinningLines(color: Colors.blue))
         : Scaffold(
-            floatingActionButton: SizedBox(
-              height: 40,
-              width: 40,
-              child: FloatingActionButton(
-                backgroundColor: Colors.blue[500],
-                onPressed: () async {
-                  final action = await ViewDialogs.addItemDialog(
-                    context,
-                    parent_id,
-                  );
-                  print('action:');
-                  print(action);
-                  if (action == ViewDialogsAction.yes) {
-                    setState(() {
-                      isLoading = true;
-                      items = [];
-                    });
-                    getItems();
-                  }
-                },
-                child: const Icon(
-                  Icons.add,
-                  size: 30,
-                ),
-              ),
-            ),
+            floatingActionButton: buildSpeedDial(),
+            // SizedBox(
+            //   height: 40,
+            //   width: 40,
+            //   child: FloatingActionButton(
+            //     backgroundColor: Colors.blue[500],
+            //     onPressed: () async {
+            //       final action = await ViewDialogs.addItemDialog(
+            //         context,
+            //         parent_id,
+            //       );
+            //       print('action:');
+            //       print(action);
+            //       if (action == ViewDialogsAction.yes) {
+            //         setState(() {
+            //           isLoading = true;
+            //           items = [];
+            //         });
+            //         getItems();
+            //       }
+            //     },
+            //     child: const Icon(
+            //       Icons.add,
+            //       size: 30,
+            //     ),
+            //   ),
+            // ),
+
             body: items.isEmpty
                 ? Center(
                     child: Text(
@@ -106,24 +109,71 @@ class GalleyWidgetState extends State<GalleryPage> {
       });
     });
   }
-}
 
-class DetailScreen extends StatelessWidget {
-  GalleryItem item;
-  DetailScreen(this.item);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        child: Center(
-          child: Image.network(
-            item.image.toString(),
-          ),
+  SpeedDial buildSpeedDial() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 28.0),
+      backgroundColor: Colors.blue,
+      visible: true,
+      curve: Curves.bounceInOut,
+      children: [
+        SpeedDialChild(
+          child: Icon(Icons.create_new_folder, color: Colors.white),
+          backgroundColor: Colors.blue,
+          onTap: () async {
+            final action = await ViewDialogs.addFolderDialog(
+              context,
+              parent_id,
+            );
+            print('action:');
+            print(action);
+            if (action == ViewDialogsAction.yes) {
+              setState(() {
+                isLoading = true;
+                items = [];
+              });
+              getItems();
+            }
+          },
+          label: 'Add Folder',
+          labelStyle:
+              TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+          labelBackgroundColor: Colors.black,
         ),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
+        SpeedDialChild(
+          child: Icon(Icons.add, color: Colors.white),
+          backgroundColor: Colors.blue[500],
+          onTap: () async {
+            final action = await ViewDialogs.addItemDialog(
+              context,
+              parent_id,
+            );
+            print('action:');
+            print(action);
+            if (action == ViewDialogsAction.yes) {
+              setState(() {
+                isLoading = true;
+                items = [];
+              });
+              getItems();
+            }
+          },
+          label: 'Add Item',
+          labelStyle:
+              TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+          labelBackgroundColor: Colors.black,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.share, color: Colors.white),
+          backgroundColor: Colors.blue,
+          onTap: () => print('Pressed Code'),
+          label: 'Share Active Items',
+          labelStyle:
+              TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+          labelBackgroundColor: Colors.black,
+        ),
+      ],
     );
   }
 }
