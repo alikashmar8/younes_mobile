@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:younes_mobile/common/api.service.dart';
 import 'package:younes_mobile/common/base-api.service.dart';
+import 'package:younes_mobile/pages/profile.dart';
 
 import 'gallery.dart';
 
@@ -34,7 +35,7 @@ class _MyHomePageState extends State<HomePage> {
       GalleryPage(null),
       const Text('page 2'),
       const Text('page 3'),
-      const Text('page 4'),
+      ProfilePage(),
     ];
   }
 
