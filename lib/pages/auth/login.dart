@@ -28,9 +28,9 @@ void displayDialog(context, title, text) => showDialog(
     );
 
 class LoginState extends State<LoginPage> {
+  bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
-    bool _obscureText = true;
     return Scaffold(
         appBar: AppBar(
           title: Text("Log In"),
@@ -69,13 +69,13 @@ class LoginState extends State<LoginPage> {
                             EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(32.0)),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
+                        suffixIcon: IconButton(
+                          onPressed: () {
                             setState(() {
                               _obscureText = !_obscureText;
                             });
                           },
-                          child: Icon(
+                          icon: Icon(
                             _obscureText
                                 ? Icons.visibility
                                 : Icons.visibility_off,
@@ -86,16 +86,16 @@ class LoginState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    new SizedBox(height: 15.0),
+                    const SizedBox(height: 15.0),
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: RaisedButton(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        padding: EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(12),
                         color: Colors.lightBlue,
-                        child: Text('Log In',
+                        child: const Text('Log In',
                             style: TextStyle(color: Colors.white)),
                         onPressed: () async {
                           var email = _emailController.text;
