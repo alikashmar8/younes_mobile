@@ -14,8 +14,15 @@ class FolderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    return Scaffold(
-               body:  GestureDetector(
+    return Container(
+      margin: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+              width: height * 0.13,
+              child: InkWell(
                 onTap: () {
                   print('going to parent: ${item.id}');
                   Navigator.push(
@@ -35,14 +42,15 @@ class FolderCard extends StatelessWidget {
                     // size: 50,
                   ),
                 ),
-              )
-        //  Row(
-         //   mainAxisAlignment: MainAxisAlignment.center,
-         //   children: <Widget>[
-         //     Text(item.name),
-         //   ],
-         // ),
-        );
-   }
+              )),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(item.name),
+            ],
+          ),
+        ],
+      ),
+    );
   }
-
+}

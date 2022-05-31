@@ -149,4 +149,24 @@ class ApiService extends BaseApiService {
           ' with status code : ${response.statusCode}');
     }
   }
+
+  Future<int> deleteResponse(String url) async {
+    String access_token = await storage.read(key: 'access_token') ?? '';
+    Map<String, String> headers = {
+      'Content-Type': 'application/json;charset=UTF-8',
+      'Accept': 'application/json',
+      'Charset': 'utf-8',
+    };
+    headers['Authorization'] = 'Bearer ' + access_token;
+    try {
+      final http.Response response =
+          await http.delete(Uri.parse(apiUrl + url), headers: headers);
+      print('response.body.toString: ' + response.body.toString());
+      return response.statusCode;
+    } on SocketException {
+      throw FetchDataException('No Internet Connection');
+    } on HandshakeException {
+      throw FetchDataException('Session Expired');
+    }
+  }
 }

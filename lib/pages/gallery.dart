@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:get/get.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
 import 'package:younes_mobile/services/gallery-items.service.dart';
 import 'package:younes_mobile/widgets/dialogs.dart';
@@ -22,6 +23,8 @@ class GalleryPage extends StatefulWidget {
 }
 
 class GalleyWidgetState extends State<GalleryPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   List<GalleryItem> items = [];
 
   String _string = '';
@@ -41,6 +44,81 @@ class GalleyWidgetState extends State<GalleryPage> {
     return isLoading
         ? Center(child: SpinKitSpinningLines(color: Colors.blue))
         : Scaffold(
+            key: _scaffoldKey,
+            appBar: parent_id != null
+                ? AppBar(
+                    title: Text('Gallery'),
+                    actions: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          Get.defaultDialog(
+                            title: 'Delete',
+                            content: Text(
+                                'Are you sure you want to delete this folder?'),
+                            actions: [
+                              FlatButton(
+                                child: Text('Cancel'),
+                                onPressed: () => Get.back(),
+                              ),
+                              FlatButton(
+                                  child: Text('Delete'),
+                                  onPressed: () async {
+                                    // if(parent_id != null) {
+                                    int status = await _galleryItemsService
+                                        .deleteItem(parent_id!);
+                                    print('status:');
+                                    print(status);
+                                    if (status <= 299) {
+                                      Get.snackbar('Success',
+                                          'Item deleted successfully',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.green,
+                                          colorText: Colors.white,
+                                          borderRadius: 10,
+                                          margin: EdgeInsets.fromLTRB(
+                                              10, 0, 10, 100),
+                                          animationDuration:
+                                              Duration(milliseconds: 500),
+                                          duration: Duration(seconds: 4),
+                                          icon: Icon(
+                                            Icons.check_box_rounded,
+                                            color: Colors.white,
+                                          ),
+                                          isDismissible: true,
+                                          snackStyle: SnackStyle.FLOATING);
+                                      print('deleted');
+                                      Navigator.of(context)..pop()..pop();
+                                    } else {
+                                      Get.back();
+                                      Get.snackbar('Error',
+                                          'Error occurred while deleting item',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                          borderRadius: 10,
+                                          margin: EdgeInsets.fromLTRB(
+                                              10, 0, 10, 100),
+                                          animationDuration:
+                                              Duration(milliseconds: 500),
+                                          duration: Duration(seconds: 4),
+                                          icon: Icon(
+                                            Icons.error,
+                                            color: Colors.white,
+                                          ),
+                                          isDismissible: true,
+                                          snackStyle: SnackStyle.FLOATING);
+                                      // Get.back();
+                                      
+                                    }
+                                  }),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  )
+                : null,
             floatingActionButton: buildSpeedDial(),
             // SizedBox(
             //   height: 40,

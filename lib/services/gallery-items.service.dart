@@ -144,4 +144,8 @@ class GalleryItemsService {
         await apiService.getResponse(galleryItemsEndpoint + '' + queryParams);
     return list.map((e) => GalleryItem.fromJson(e)).toList();
   }
+
+  Future<dynamic> deleteItem(String id) async {
+    return await apiService.deleteResponse(galleryItemsEndpoint + id);
+  }
 }
