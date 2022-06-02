@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/pages/gallery-item-details.dart';
 
 class FileCard extends StatelessWidget {
   GalleryItem item;
@@ -14,93 +15,108 @@ class FileCard extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.all(10),
-      child: SizedBox(
-          height: height * 0.3,
-          child: Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            elevation: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Stack(
-                  // ignore: prefer_const_literals_to_create_immutables
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15)),
-                      child: SizedBox(
-                        height: height * 0.17,
-                        width: double.infinity,
-                        child: Image.network(
-                          baseUrl + item.image.toString(),
-                          fit: BoxFit.fill,
-                          color: item.quantity! < 1
-                              ? Colors.black.withOpacity(0.5)
-                              : null,
-                          colorBlendMode: BlendMode.darken,
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                        margin: EdgeInsets.only(right: 5, top: 5),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.favorite_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            print('make favorite');
-                          },
-                        ),
-                      ),
-                    ),
-                    item.quantity! < 1
-                        ? Align(
-                            alignment: Alignment.topCenter,
-                            child: Container(
-                              margin: EdgeInsets.only(top: height * 0.01),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                // ignore: prefer_const_literals_to_create_immutables
-                                children: <Widget>[
-                                  FittedBox(
-                                    child: Icon(
-                                      Icons.block,
-                                      color: Colors.red,
-                                      size: width * 0.3,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Out of stock',
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : Container()
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    item.name,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text('Price: ' + item.price.toString()),
-                )
-              ],
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GalleryItemDetailsPage(
+                item: item,
+              ),
             ),
-          )),
+          );
+        },
+        child: SizedBox(
+            height: height * 0.3,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              elevation: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Stack(
+                    // ignore: prefer_const_literals_to_create_immutables
+                    children: <Widget>[
+                      ClipRRect(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15)),
+                        child: SizedBox(
+                          height: height * 0.17,
+                          width: double.infinity,
+                          child: Hero(
+                            tag: item.id,
+                            child: Image.network(
+                              baseUrl + item.image.toString(),
+                              fit: BoxFit.fill,
+                              color: item.quantity! < 1
+                                  ? Colors.black.withOpacity(0.5)
+                                  : null,
+                              colorBlendMode: BlendMode.darken,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          margin: EdgeInsets.only(right: 5, top: 5),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.favorite_outline,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              print('make favorite');
+                            },
+                          ),
+                        ),
+                      ),
+                      item.quantity! < 1
+                          ? Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                margin: EdgeInsets.only(top: height * 0.01),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  // ignore: prefer_const_literals_to_create_immutables
+                                  children: <Widget>[
+                                    FittedBox(
+                                      child: Icon(
+                                        Icons.block,
+                                        color: Colors.red,
+                                        size: width * 0.3,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Out of stock',
+                                      style: TextStyle(
+                                          fontSize: 15, color: Colors.red),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Container()
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      item.name,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Price: ' + item.price.toString()),
+                  )
+                ],
+              ),
+            )),
+      ),
     );
   }
 }

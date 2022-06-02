@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:younes_mobile/models/user.model.dart';
+
 GalleryItem galleryItemFromJson(String str) =>
     GalleryItem.fromJson(json.decode(str));
 
@@ -21,6 +23,8 @@ class GalleryItem {
     required this.businessId,
     required this.createdById,
     this.updatedById,
+    this.createdBy,
+    this.updatedBy,
   });
 
   int id;
@@ -35,6 +39,8 @@ class GalleryItem {
   int businessId;
   int createdById;
   int? updatedById;
+  User? createdBy;
+  User? updatedBy;
 
   factory GalleryItem.fromJson(Map<String, dynamic> json) => GalleryItem(
         id: json["id"],
@@ -49,6 +55,10 @@ class GalleryItem {
         businessId: json["business_id"],
         createdById: json["created_by_id"],
         updatedById: json["updated_by_id"],
+        createdBy:
+            json["created_by"] == null ? null : User.fromJson(json["created_by"]),
+        updatedBy:
+            json["updated_by"] == null ? null : User.fromJson(json["updated_by"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,5 +74,7 @@ class GalleryItem {
         "business_id": businessId,
         "created_by_id": createdById,
         "updated_by_id": updatedById,
+        "created_by": createdBy!.toJson(),
+        "updated_by": updatedBy!.toJson(),
       };
 }

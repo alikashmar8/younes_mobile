@@ -148,4 +148,17 @@ class GalleryItemsService {
   Future<dynamic> deleteItem(String id) async {
     return await apiService.deleteResponse(galleryItemsEndpoint + id);
   }
+
+  Future<GalleryItem> getById(String parent_id) async {
+    dynamic itemJson =
+        await apiService.getResponse(galleryItemsEndpoint + parent_id);
+    return GalleryItem.fromJson(itemJson);
+  }
+
+  sellItem(int id, int quantity) async {
+    dynamic res = await apiService.postResponse(
+        galleryItemsEndpoint + id.toString() + '/sell/',
+        {'quantity': quantity.toString()});
+    return res;
+  }
 }

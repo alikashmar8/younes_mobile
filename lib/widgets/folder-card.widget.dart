@@ -24,7 +24,6 @@ class FolderCard extends StatelessWidget {
               width: height * 0.13,
               child: InkWell(
                 onTap: () {
-                  print('going to parent: ${item.id}');
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -32,7 +31,7 @@ class FolderCard extends StatelessWidget {
                         item.id.toString(),
                       ),
                     ),
-                  );
+                  ).then((value) => callback(value));
                   // Get.to(GalleryPage(item.id.toString()));
                   // callback(item.id.toString());
                 },

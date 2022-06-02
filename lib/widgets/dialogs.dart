@@ -13,6 +13,7 @@ import 'package:younes_mobile/common/api-endpoints.dart';
 import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/common/api.service.dart';
 import 'package:younes_mobile/main.dart';
+import 'package:younes_mobile/models/gallery-item.dart';
 
 enum ViewDialogsAction { yes, no }
 
@@ -369,5 +370,29 @@ class ViewDialogs {
               );
             }));
     return action;
+  }
+
+  static showItemDetailsDialog(BuildContext context, GalleryItem item) {
+    Get.dialog(
+      AlertDialog(
+        title: Text(item.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(item.description ?? ''),
+            Text(item.price.toString()),
+            Text(item.quantity.toString()),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
