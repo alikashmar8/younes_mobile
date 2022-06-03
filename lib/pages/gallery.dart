@@ -5,7 +5,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/models/gallery-item.model.dart';
 import 'package:younes_mobile/services/gallery-items.service.dart';
 import 'package:younes_mobile/widgets/dialogs.dart';
 import 'package:younes_mobile/widgets/file-card.widget.dart';
@@ -102,8 +102,6 @@ class GalleyWidgetState extends State<GalleryPage> {
                                     // if(parent_id != null) {
                                     int status = await _galleryItemsService
                                         .deleteItem(parent_id!);
-                                    print('status:');
-                                    print(status);
                                     if (status <= 299) {
                                       Get.snackbar('Success',
                                           'Item deleted successfully',
@@ -180,9 +178,11 @@ class GalleyWidgetState extends State<GalleryPage> {
                                     getItems();
                                   }
                                 })
-                            : FileCard(
-                                items[index],
-                              );
+                            : FileCard(items[index], (val) {
+                                if (val == 'deleted') {
+                                  getItems();
+                                }
+                              });
                       },
                     ))
                   ]),
@@ -231,7 +231,10 @@ class GalleyWidgetState extends State<GalleryPage> {
                 isLoading = true;
                 items = [];
               });
-              getItems();
+              await getItems();
+              setState(() {
+                isLoading = false;
+              });
             }
           },
           label: 'Add Item',

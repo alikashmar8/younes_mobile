@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:younes_mobile/common/api.service.dart';
 import 'package:younes_mobile/common/base-api.service.dart';
+import 'package:younes_mobile/pages/favorites.page.dart';
 import 'package:younes_mobile/pages/profile.dart';
 
 import 'gallery.dart';
@@ -33,7 +34,7 @@ class _MyHomePageState extends State<HomePage> {
   _MyHomePageState(this.jwt, this.payload) {
     listOfWidgets = [
       GalleryPage(null),
-      const Text('page 2'),
+      FavoritesPage(),
       const Text('page 3'),
       ProfilePage(),
     ];

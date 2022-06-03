@@ -2,12 +2,25 @@
 
 import 'package:flutter/material.dart';
 import 'package:younes_mobile/common/api.constants.dart';
-import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/models/gallery-item.model.dart';
 import 'package:younes_mobile/pages/gallery-item-details.dart';
+import 'package:younes_mobile/services/gallery-items.service.dart';
 
-class FileCard extends StatelessWidget {
+typedef void StringCallback(String val);
+
+class FileCard extends StatefulWidget {
   GalleryItem item;
-  FileCard(this.item);
+  final StringCallback callback;
+
+  FileCard(this.item, this.callback);
+
+  @override
+  State<FileCard> createState() => _FileCardState();
+}
+
+class _FileCardState extends State<FileCard> {
+  GalleryItemsService galleryItemsService = GalleryItemsService();
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -21,10 +34,11 @@ class FileCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => GalleryItemDetailsPage(
-                item: item,
+                item: widget.item,
               ),
             ),
-          );
+          ).then((value) => widget.callback(value));
+          ;
         },
         child: SizedBox(
             height: height * 0.3,
@@ -47,11 +61,11 @@ class FileCard extends StatelessWidget {
                           height: height * 0.17,
                           width: double.infinity,
                           child: Hero(
-                            tag: item.id,
+                            tag: widget.item.id,
                             child: Image.network(
-                              baseUrl + item.image.toString(),
+                              baseUrl + widget.item.image.toString(),
                               fit: BoxFit.fill,
-                              color: item.quantity! < 1
+                              color: widget.item.quantity! < 1
                                   ? Colors.black.withOpacity(0.5)
                                   : null,
                               colorBlendMode: BlendMode.darken,
@@ -63,18 +77,44 @@ class FileCard extends StatelessWidget {
                         alignment: Alignment.topRight,
                         child: Container(
                           margin: EdgeInsets.only(right: 5, top: 5),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.favorite_outline,
-                              color: Colors.red,
-                            ),
-                            onPressed: () {
-                              print('make favorite');
-                            },
-                          ),
+                          child: widget.item.isFavorite
+                              ? InkWell(
+                                  onTap: () async {
+                                    int status = await galleryItemsService
+                                        .unfavorite(widget.item.id.toString());
+                                    if (status <= 299) {
+                                      setState(() {
+                                        widget.item.isFavorite = false;
+                                      });
+                                    } else {
+                                      print('Error unfavoriting item');
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                  ),
+                                )
+                              : InkWell(
+                                  onTap: () async {
+                                    int status = await galleryItemsService
+                                        .makefavorite(widget.item.id.toString());
+                                    if (status <= 299) {
+                                      setState(() {
+                                        widget.item.isFavorite = true;
+                                      });
+                                    } else {
+                                      print('Error unfavoriting item');
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.favorite_border,
+                                    color: Colors.red,
+                                  ),
+                                ),
                         ),
                       ),
-                      item.quantity! < 1
+                      widget.item.quantity! < 1
                           ? Align(
                               alignment: Alignment.topCenter,
                               child: Container(
@@ -106,12 +146,12 @@ class FileCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      item.name,
+                      widget.item.name,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text('Price: ' + item.price.toString()),
+                    child: Text('Price: ' + widget.item.price.toString()),
                   )
                 ],
               ),

@@ -2,7 +2,7 @@
 
 import 'package:younes_mobile/common/api-endpoints.dart';
 import 'package:younes_mobile/common/api.service.dart';
-import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/models/gallery-item.model.dart';
 
 class GalleryItemsService {
   final ApiService apiService = ApiService();
@@ -160,5 +160,26 @@ class GalleryItemsService {
         galleryItemsEndpoint + id.toString() + '/sell/',
         {'quantity': quantity.toString()});
     return res;
+  }
+
+  Future<int> updateFile(String id, dynamic data) async {
+    return await apiService.putResponse(
+        galleryItemsEndpoint + 'files/' + id, data);
+  }
+
+  getFavorites() async {
+    List<dynamic> list =
+        await apiService.getResponse(galleryItemsEndpoint + 'favorites/');
+    return list.map((e) => GalleryItem.fromJson(e)).toList();
+  }
+
+  Future<int> unfavorite(String id) async {
+    return await apiService
+        .putResponse(galleryItemsEndpoint + id + '/unfavorite/', {});
+  }
+
+  Future<int> makefavorite(String id) async {
+    return await apiService
+        .putResponse(galleryItemsEndpoint + id + '/make-favorite', {});
   }
 }

@@ -25,6 +25,7 @@ class ApiService extends BaseApiService {
         'Charset': 'utf-8',
         'Authorization': 'Bearer ' + access_token,
       });
+      print(response.body);
       responseJson = returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet Connection');
@@ -161,6 +162,25 @@ class ApiService extends BaseApiService {
     try {
       final http.Response response =
           await http.delete(Uri.parse(apiUrl + url), headers: headers);
+      print('response.body.toString: ' + response.body.toString());
+      return response.statusCode;
+    } on SocketException {
+      throw FetchDataException('No Internet Connection');
+    } on HandshakeException {
+      throw FetchDataException('Session Expired');
+    }
+  }
+
+  Future<int> putResponse(String id, dynamic data) async {
+    String access_token = await storage.read(key: 'access_token') ?? '';
+    Map<String, String> headers = {};
+    headers['Authorization'] = 'Bearer ' + access_token;
+    try {
+      final http.Response response = await http.put(
+        Uri.parse(apiUrl + id),
+        headers: headers,
+        body: data,
+      );
       print('response.body.toString: ' + response.body.toString());
       return response.statusCode;
     } on SocketException {

@@ -13,7 +13,7 @@ import 'package:younes_mobile/common/api-endpoints.dart';
 import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/common/api.service.dart';
 import 'package:younes_mobile/main.dart';
-import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/models/gallery-item.model.dart';
 
 enum ViewDialogsAction { yes, no }
 

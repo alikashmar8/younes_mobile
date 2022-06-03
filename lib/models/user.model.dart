@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/models/gallery-item.model.dart';
 
 User userFromJson(String str) => User.fromJson(json.decode(str));
 

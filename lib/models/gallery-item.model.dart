@@ -20,6 +20,7 @@ class GalleryItem {
     required this.type,
     this.description,
     this.isActive = true,
+    this.isFavorite = true,
     required this.businessId,
     required this.createdById,
     this.updatedById,
@@ -36,6 +37,7 @@ class GalleryItem {
   String type;
   String? description;
   bool isActive;
+  bool isFavorite = false;
   int businessId;
   int createdById;
   int? updatedById;
@@ -52,20 +54,23 @@ class GalleryItem {
         type: json["type"],
         description: json["description"],
         isActive: json["is_active"],
+        isFavorite: json["is_favorite"],
         businessId: json["business_id"],
         createdById: json["created_by_id"],
         updatedById: json["updated_by_id"],
-        createdBy:
-            json["created_by"] == null ? null : User.fromJson(json["created_by"]),
-        updatedBy:
-            json["updated_by"] == null ? null : User.fromJson(json["updated_by"]),
+        createdBy: json["created_by"] == null
+            ? null
+            : User.fromJson(json["created_by"]),
+        updatedBy: json["updated_by"] == null
+            ? null
+            : User.fromJson(json["updated_by"]),
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "price": price,
-        "quantity": quantity,
+        "price": price != null ? price.toString() : null,
+        "quantity": quantity != null ? quantity.toString() : null,
         "image": image == null ? null : image,
         "parent_id": parentId,
         "type": type,
@@ -73,8 +78,6 @@ class GalleryItem {
         "is_active": isActive,
         "business_id": businessId,
         "created_by_id": createdById,
-        "updated_by_id": updatedById,
-        "created_by": createdBy!.toJson(),
-        "updated_by": updatedBy!.toJson(),
+        "updated_by_id": updatedById
       };
 }

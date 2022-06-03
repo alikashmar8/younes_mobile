@@ -2,8 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
 import 'package:younes_mobile/common/api.constants.dart';
-import 'package:younes_mobile/models/gallery-item.dart';
+import 'package:younes_mobile/models/gallery-item.model.dart';
 import 'package:younes_mobile/services/gallery-items.service.dart';
 
 class GalleryItemDetailsPage extends StatefulWidget {
@@ -17,6 +18,7 @@ class GalleryItemDetailsPage extends StatefulWidget {
 class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
   GalleryItemsService galleryItemsService = GalleryItemsService();
   late GalleryItem item;
+  Map<String, String> updatedItem = {};
   bool isLoading = true;
 
   @override
@@ -28,14 +30,191 @@ class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? const Center(
-            child: Center(child: SpinKitSpinningLines(color: Colors.blue)),
+        ? Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.white,
+            child: const Center(
+              child: SpinKitSpinningLines(color: Colors.blue),
+            ),
           )
         : Scaffold(
             appBar: AppBar(
               title: Text(item.name),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    Get.defaultDialog(
+                      title: 'Edit',
+                      content: Column(
+                        children: [
+                          TextField(
+                            controller: TextEditingController(
+                                text: updatedItem['name']),
+                            onChanged: (value) {
+                              updatedItem['name'] = value;
+                            },
+                          ),
+                          TextField(
+                            controller: TextEditingController(
+                                text: updatedItem['price'].toString()),
+                            onChanged: (value) {
+                              updatedItem['price'] = value;
+                            },
+                          ),
+                          TextField(
+                            controller: TextEditingController(
+                                text: updatedItem['description']),
+                            onChanged: (value) {
+                              updatedItem['description'] = value;
+                            },
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          child: const Text('Cancel'),
+                          onPressed: () => Get.back(),
+                        ),
+                        ElevatedButton(
+                          child: const Text('Save'),
+                          onPressed: () async {
+                            int status = await galleryItemsService.updateFile(
+                                item.id.toString(), updatedItem);
+                            if (status <= 299) {
+                              Get.snackbar(
+                                'Success',
+                                'Updated successfully',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.green,
+                                borderRadius: 10,
+                                margin: const EdgeInsets.all(10),
+                                snackStyle: SnackStyle.FLOATING,
+                                duration: const Duration(seconds: 2),
+                              );
+                              Navigator.of(context).pop();
+                              initializeData();
+                            } else {
+                              Get.snackbar(
+                                'Error',
+                                'Failed to update',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.red,
+                                borderRadius: 10,
+                                margin: const EdgeInsets.all(10),
+                                snackStyle: SnackStyle.FLOATING,
+                                duration: const Duration(seconds: 2),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    Get.defaultDialog(
+                      title: 'Delete',
+                      content: Column(
+                        children: [
+                          Text(
+                            'Are you sure you want to delete ' +
+                                item.name +
+                                '?',
+                            style: const TextStyle(fontSize: 18),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                            textScaleFactor: 1.0,
+                            textDirection: TextDirection.ltr,
+                            locale: null,
+                            semanticsLabel: null,
+                            strutStyle: StrutStyle.disabled,
+                            textWidthBasis: TextWidthBasis.parent,
+                            textHeightBehavior: null,
+                          ),
+                          const Text(
+                            'This action cannot be undone.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.redAccent,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                            textScaleFactor: 1.0,
+                            textDirection: TextDirection.ltr,
+                            locale: Locale('en', 'US'),
+                            semanticsLabel: 'Delete',
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        MaterialButton(
+                          child: const Text('Cancel'),
+                          onPressed: () => Get.back(),
+                        ),
+                        MaterialButton(
+                            child: const Text('Delete'),
+                            onPressed: () async {
+                              // if(parent_id != null) {
+                              int status = await galleryItemsService
+                                  .deleteItem(item.id.toString());
+                              if (status <= 299) {
+                                Get.snackbar(
+                                    'Success', 'Item deleted successfully',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.green,
+                                    colorText: Colors.white,
+                                    borderRadius: 10,
+                                    margin: const EdgeInsets.fromLTRB(
+                                        10, 0, 10, 100),
+                                    animationDuration:
+                                        const Duration(milliseconds: 500),
+                                    duration: const Duration(seconds: 4),
+                                    icon: const Icon(
+                                      Icons.check_box_rounded,
+                                      color: Colors.white,
+                                    ),
+                                    isDismissible: true,
+                                    snackStyle: SnackStyle.FLOATING);
+                                Navigator.of(context)
+                                  ..pop('deleted')
+                                  ..pop('deleted');
+                              } else {
+                                Get.back();
+                                Get.snackbar('Error',
+                                    'Error occurred while deleting item',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.red,
+                                    colorText: Colors.white,
+                                    borderRadius: 10,
+                                    margin: const EdgeInsets.fromLTRB(
+                                        10, 0, 10, 100),
+                                    animationDuration:
+                                        const Duration(milliseconds: 500),
+                                    duration: const Duration(seconds: 4),
+                                    icon: const Icon(
+                                      Icons.error,
+                                      color: Colors.white,
+                                    ),
+                                    isDismissible: true,
+                                    snackStyle: SnackStyle.FLOATING);
+                              }
+                            }),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
-            body: Column(
+            body: ListView(
+              shrinkWrap: true,
               children: <Widget>[
                 SizedBox(
                   height: MediaQuery.of(context).size.height / 2,
@@ -81,108 +260,35 @@ class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
                   height: 2.0,
                   color: Colors.black,
                 ),
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Description:  ',
-                          style: TextStyle(
-                              fontSize: 15.0, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          item.description ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ],
-                    ),
+                Container(
+                  margin: const EdgeInsets.all(20),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Description:  ',
+                        style: TextStyle(
+                            fontSize: 15.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        item.description ?? '',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ],
                   ),
                 ),
                 const Divider(height: 2.0, color: Colors.black),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: MaterialButton(
-                //         onPressed: () {
-                //           showDialog(
-                //               context: context,
-                //               builder: (context) {
-                //                 return AlertDialog(
-                //                   title: Text("Buy"),
-                //                   content: Text("How many do you want to buy?"),
-                //                   actions: <Widget>[
-                //                     MaterialButton(
-                //                       onPressed: () {
-                //                         Navigator.of(context).pop(context);
-                //                       },
-                //                       child: Text("Close"),
-                //                     )
-                //                   ],
-                //                 );
-                //               });
-                //         },
-                //         color: Colors.white,
-                //         elevation: 0.2,
-                //         child: Row(
-                //           children: <Widget>[
-                //             Expanded(
-                //                 child: Text(
-                //               "Buy",
-                //               style: TextStyle(color: Colors.grey),
-                //             )),
-                //             Expanded(child: Icon(Icons.arrow_drop_down))
-                //           ],
-                //         ),
-                //       ),
-                //     ),
-                //     Expanded(
-                //       child: MaterialButton(
-                //         onPressed: () {
-                //           showDialog(
-                //               context: context,
-                //               builder: (context) {
-                //                 return AlertDialog(
-                //                   title: Text("Rent"),
-                //                   content: Text("How many do you want to rent?"),
-                //                   actions: <Widget>[
-                //                     MaterialButton(
-                //                       onPressed: () {
-                //                         Navigator.of(context).pop(context);
-                //                       },
-                //                       child: Text("Close"),
-                //                     )
-                //                   ],
-                //                 );
-                //               });
-                //         },
-                //         color: Colors.white,
-                //         elevation: 0.2,
-                //         child: Row(
-                //           children: <Widget>[
-                //             Expanded(
-                //                 child: Text(
-                //               "Rent",
-                //               style: TextStyle(color: Colors.grey),
-                //             )),
-                //             Expanded(child: Icon(Icons.arrow_drop_down))
-                //           ],
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // Divider(
-                //   height: 2.0,
-                //   color: Colors.black,
-                // ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  margin: const EdgeInsets.all(20),
                   child: Row(children: [
+                    const Text(
+                      'Created By:  ',
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.bold),
+                    ),
                     Expanded(
-                      child: Text('Created by: ' + item.createdBy!.name),
+                      child: Text(item.createdBy!.name),
                     )
                   ]),
                 ),
@@ -191,10 +297,15 @@ class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
                   color: Colors.black,
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  margin: const EdgeInsets.all(20),
                   child: Row(children: [
+                    const Text(
+                      'Updated By:  ',
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.bold),
+                    ),
                     Expanded(
-                      child: Text('Updated by: ' +
+                      child: Text(
                           (item.updatedBy != null ? item.updatedBy!.name : '')),
                     )
                   ]),
@@ -288,6 +399,10 @@ class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
         await galleryItemsService.getById(widget.item.id.toString());
     setState(() {
       item = res;
+      updatedItem['name'] = res.name;
+      updatedItem['description'] = item.description!;
+      updatedItem['price'] = item.price.toString();
+      updatedItem['quantity'] = item.quantity.toString();
       isLoading = false;
     });
   }
