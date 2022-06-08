@@ -226,7 +226,7 @@ class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
                         child: Image(
                           height: MediaQuery.of(context).size.height / 3 - 30,
                           image: NetworkImage(
-                            '${baseUrl}${item.image}',
+                            item.image ?? "",
                           ),
                           fit: BoxFit.contain,
                           color: item.quantity! < 1

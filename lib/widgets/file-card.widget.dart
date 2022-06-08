@@ -63,7 +63,7 @@ class _FileCardState extends State<FileCard> {
                           child: Hero(
                             tag: widget.item.id,
                             child: Image.network(
-                              baseUrl + widget.item.image.toString(),
+                              widget.item.image.toString(),
                               fit: BoxFit.fill,
                               color: widget.item.quantity! < 1
                                   ? Colors.black.withOpacity(0.5)
@@ -97,8 +97,9 @@ class _FileCardState extends State<FileCard> {
                                 )
                               : InkWell(
                                   onTap: () async {
-                                    int status = await galleryItemsService
-                                        .makefavorite(widget.item.id.toString());
+                                    int status =
+                                        await galleryItemsService.makefavorite(
+                                            widget.item.id.toString());
                                     if (status <= 299) {
                                       setState(() {
                                         widget.item.isFavorite = true;
