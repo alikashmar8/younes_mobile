@@ -190,32 +190,35 @@ class ViewDialogs {
                 var length = await _image!.length();
 
                 // try {
-                  ///[1] CREATING INSTANCE
-                  var dioRequest = Dio();
-                  // dioRequest.options.baseUrl = '<YOUR-URL>';
+                ///[1] CREATING INSTANCE
+                var dioRequest = Dio();
+                // dioRequest.options.baseUrl = '<YOUR-URL>';
 
-                  //[2] ADDING TOKEN
-                  dioRequest.options.headers = {
-                    'Authorization': 'Bearer $access_token',
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                  };
+                //[2] ADDING TOKEN
+                dioRequest.options.headers = {
+                  'Authorization': 'Bearer $access_token',
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                };
 
-                  // FORM DATA
+                // FORM DATA
                 String fileName = imageFile!.path.split('/').last;
                 FormData formData = FormData.fromMap({
-                  'image': await MultipartFile.fromFile(imageFile!.path, filename:fileName),   // change 'image' to the field name in your request
-                    'name': data['name'],  // you can send other data in request if required
-                    'price': data['price'],
-                    'description': data['description'],
-                    'quantity': data['quantity'].toString()
+                  'image': await MultipartFile.fromFile(imageFile!.path,
+                      filename:
+                          fileName), // change 'image' to the field name in your request
+                  'name': data[
+                      'name'], // you can send other data in request if required
+                  'price': data['price'],
+                  'description': data['description'],
+                  'quantity': data['quantity'].toString()
                 });
-                
+
                 var response = await dioRequest.post(
-                    uri.toString(),
-                    data: formData,
-                  );
-                  final result = json.decode(response.toString());
-                  print(result);
+                  uri.toString(),
+                  data: formData,
+                );
+                final result = json.decode(response.toString());
+                print(result);
                 // } catch (err) {
                 //   print('ERROR  $err');
                 //   print(err);
@@ -228,25 +231,24 @@ class ViewDialogs {
                 // String imageString = "data:image/jpeg;base64," + base64Encode(imageBytes);
                 // apiCall(imageString);
 
+                //[3] ADDING EXTRA INFO
+                // var formData = new FormData.fromMap({
+                //   'name': data['name'],
+                //   'price': data['price'],
+                //   'description': data['description'],
+                //   'quantity': data['quantity'].toString()
+                // });
 
-                  //[3] ADDING EXTRA INFO
-                  // var formData = new FormData.fromMap({
-                  //   'name': data['name'],
-                  //   'price': data['price'],
-                  //   'description': data['description'],
-                  //   'quantity': data['quantity'].toString()
-                  // });
+                //[4] ADD IMAGE TO UPLOAD
+                var file = await MultipartFile.fromFile(
+                  _image!.path,
+                  filename: basename(_image!.path),
+                  // contentType: Dio().MediaType("image", basename(image.path))
+                );
 
-                  //[4] ADD IMAGE TO UPLOAD
-                  var file = await MultipartFile.fromFile(
-                    _image!.path,
-                    filename: basename(_image!.path),
-                    // contentType: Dio().MediaType("image", basename(image.path))
-                  );
+                // formData.files.add(MapEntry('image', file));
 
-                  // formData.files.add(MapEntry('image', file));
-
-                  //[5] SEND TO SERVER
+                //[5] SEND TO SERVER
                 //   var response = await dioRequest.post(
                 //     uri.toString(),
                 //     data: formData,
