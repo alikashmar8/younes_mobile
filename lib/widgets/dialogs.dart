@@ -2,24 +2,23 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart' hide FormData, MultipartFile;
-import 'package:spinner_input/spinner_input.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:younes_mobile/common/api.constants.dart';
-import 'package:younes_mobile/main.dart';
-import 'package:younes_mobile/common/base-api.service.dart';
-import 'package:http/http.dart' as http;
+
 // hide MultipartFile;
 import 'package:dio/dio.dart';
-import 'dart:convert';
-
-import 'package:path/path.dart';
-import 'package:async/async.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
+import 'package:image_picker/image_picker.dart';
+import 'package:younes_mobile/common/api-endpoints.dart';
+import 'package:younes_mobile/common/api.constants.dart';
+import 'package:younes_mobile/common/api.service.dart';
+import 'package:younes_mobile/main.dart';
+import 'package:younes_mobile/models/gallery-item.model.dart';
 
 enum ViewDialogsAction { yes, no }
 
 class ViewDialogs {
+  static ApiService apiService = ApiService();
   static Future<ViewDialogsAction?> showOkCancelDialog(
     BuildContext context,
     String title,
@@ -43,11 +42,17 @@ class ViewDialogs {
     return action;
   }
 
-  static Future<void> addItemDialog(BuildContext context) async {
+  static Future<ViewDialogsAction> addItemDialog(
+      BuildContext context, String? parent_id) async {
     // double spinner = 0;
-    File? _image;
+    TextEditingController nameController = TextEditingController();
+    TextEditingController priceController = TextEditingController();
+    TextEditingController descriptionController = TextEditingController();
     File? imageFile = null;
     final ImagePicker _picker = ImagePicker();
+    String errors = '';
+    bool isLoading = false;
+    var height = MediaQuery.of(context).size.height;
 
     String? user = await storage.read(key: 'user');
     var business_id = json.decode(user!)['business_id'];
@@ -56,9 +61,6 @@ class ViewDialogs {
       context: context,
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(builder: (context, setState) {
-        TextEditingController nameController = TextEditingController();
-        TextEditingController priceController = TextEditingController();
-        TextEditingController descriptionController = TextEditingController();
         Map<String, dynamic> data = {
           'name': nameController.text,
           'price': priceController.text,
@@ -66,107 +68,122 @@ class ViewDialogs {
           'quantity': 1,
           'type': 'item',
           'business_id': business_id,
+          'parent_id': parent_id,
         };
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Text('Add Item'),
-          content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            Row(
-              children: [
-                const Text("Add an Image"),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.add_a_photo),
-                  iconSize: 30,
+          content: isLoading
+              ? const SpinKitSpinningLines(
                   color: Colors.blue,
-                  onPressed: () async {
-                    var image = await ImagePicker.pickImage(
-                      source: ImageSource.gallery,
-                      maxHeight: 240.0,
-                      maxWidth: 240.0,
-                    );
-                    setState(() {
-                      _image = image;
-                      imageFile = image;
-                    });
-                  },
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            const Text("Add an Image"),
+                            const SizedBox(width: 10),
+                            IconButton(
+                              icon: const Icon(Icons.add_a_photo),
+                              iconSize: 30,
+                              color: Colors.blue,
+                              onPressed: () async {
+                                var image = await ImagePicker.pickImage(
+                                  source: ImageSource.gallery,
+                                  maxHeight: 240.0,
+                                  maxWidth: 240.0,
+                                );
+                                setState(() {
+                                  imageFile = image;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Name',
+                          ),
+                          controller: nameController,
+                          onChanged: (value) {
+                            data['name'] = value;
+                          },
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Name Cannot be empty!';
+                            }
+                          },
+                          onSaved: (value) {
+                            data['name'] = value;
+                          },
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Price',
+                          ),
+                          keyboardType: TextInputType.number,
+                          controller: priceController,
+                          onChanged: (value) {
+                            data['price'] = value;
+                          },
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Price Cannot be empty!';
+                            }
+                          },
+                          onSaved: (value) {
+                            data['price'] = value;
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Row(
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              // const Text(
+                              //   "Item Quantity",
+                              // ),
+                              // const SizedBox(width: 10),
+                              // SpinnerInput(
+                              //   middleNumberPadding:
+                              //       const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                              //   spinnerValue: spinner,
+                              //   minValue: 0,
+                              //   maxValue: 200,
+                              //   onChange: (newValue) {
+                              //     setState(() {
+                              //       spinner = newValue;
+                              //     });
+                              //   },
+                              // ),
+                            ],
+                          ),
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Item Description',
+                          ),
+                          controller: descriptionController,
+                          onChanged: (value) {
+                            data['description'] = value;
+                          },
+                          onSaved: (value) {
+                            data['description'] = value;
+                          },
+                        ),
+                        errors.isNotEmpty
+                            ? Text(
+                                errors,
+                                style: TextStyle(color: Colors.red),
+                              )
+                            : Container(),
+                      ]),
                 ),
-              ],
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Name',
-              ),
-              controller: nameController,
-              onChanged: (value) {
-                data['name'] = value;
-              },
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Name Cannot be empty!';
-                }
-              },
-              onSaved: (value) {
-                data['name'] = value;
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Price',
-              ),
-              keyboardType: TextInputType.number,
-              controller: priceController,
-              onChanged: (value) {
-                data['price'] = value;
-              },
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Price Cannot be empty!';
-                }
-              },
-              onSaved: (value) {
-                data['price'] = value;
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                // ignore: prefer_const_literals_to_create_immutables
-                children: [
-                  // const Text(
-                  //   "Item Quantity",
-                  // ),
-                  // const SizedBox(width: 10),
-                  // SpinnerInput(
-                  //   middleNumberPadding:
-                  //       const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  //   spinnerValue: spinner,
-                  //   minValue: 0,
-                  //   maxValue: 200,
-                  //   onChange: (newValue) {
-                  //     setState(() {
-                  //       spinner = newValue;
-                  //     });
-                  //   },
-                  // ),
-                ],
-              ),
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Item Description',
-              ),
-              controller: descriptionController,
-              onChanged: (value) {
-                data['description'] = value;
-              },
-              onSaved: (value) {
-                data['description'] = value;
-              },
-            ),
-          ]),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -174,25 +191,39 @@ class ViewDialogs {
             ),
             TextButton(
               onPressed: () async {
-                print(data);
-                print('_image');
-                if (_image != null) {
-                  data['image'] = _image;
+                setState(() {
+                  errors = '';
+                  isLoading = true;
+                });
+                if (imageFile == null) {
+                  setState(() {
+                    errors = 'Please add an image';
+                    isLoading = false;
+                  });
+                  return;
                 }
+                if (nameController.text.isEmpty) {
+                  setState(() {
+                    errors = 'Please enter a name';
+                    isLoading = false;
+                  });
+                  return;
+                }
+                if (priceController.text.isEmpty) {
+                  setState(() {
+                    errors = 'Please enter a price';
+                    isLoading = false;
+                  });
+                  return;
+                }
+
                 String access_token =
                     await storage.read(key: 'access_token') ?? '';
                 var uri = Uri.parse(apiUrl + 'gallery-items/files');
-                var dio = Dio();
-                // ignore: deprecated_member_use
-                var stream =
-                    http.ByteStream(DelegatingStream.typed(_image!.openRead()));
-                // get file length
-                var length = await _image!.length();
 
                 // try {
                 ///[1] CREATING INSTANCE
                 var dioRequest = Dio();
-                // dioRequest.options.baseUrl = '<YOUR-URL>';
 
                 //[2] ADDING TOKEN
                 dioRequest.options.headers = {
@@ -210,90 +241,35 @@ class ViewDialogs {
                       'name'], // you can send other data in request if required
                   'price': data['price'],
                   'description': data['description'],
-                  'quantity': data['quantity'].toString()
+                  'quantity': data['quantity'].toString(),
+                  'parent_id': data['parent_id'],
                 });
-
-                var response = await dioRequest.post(
-                  uri.toString(),
-                  data: formData,
-                );
-                final result = json.decode(response.toString());
-                print(result);
-                // } catch (err) {
-                //   print('ERROR  $err');
-                //   print(err);
-                // }
-
-                // BASE64
-                // read image bytes from disk as a list
-                // List<int> imageBytes = File(imageFile?.path ?? "").readAsBytesSync();
-                // convert that list to a string & encode the as base64 files
-                // String imageString = "data:image/jpeg;base64," + base64Encode(imageBytes);
-                // apiCall(imageString);
-
-                //[3] ADDING EXTRA INFO
-                // var formData = new FormData.fromMap({
-                //   'name': data['name'],
-                //   'price': data['price'],
-                //   'description': data['description'],
-                //   'quantity': data['quantity'].toString()
-                // });
-
-                //[4] ADD IMAGE TO UPLOAD
-                var file = await MultipartFile.fromFile(
-                  _image!.path,
-                  filename: basename(_image!.path),
-                  // contentType: Dio().MediaType("image", basename(image.path))
-                );
-
-                // formData.files.add(MapEntry('image', file));
-
-                //[5] SEND TO SERVER
-                //   var response = await dioRequest.post(
-                //     uri.toString(),
-                //     data: formData,
-                //   );
-                //   final result = json.decode(response.toString())['result'];
-                // } catch (err) {
-                //   print('ERROR  $err');
-                //   print(err);
-                // }
-
-                // var request = http.MultipartRequest("POST", uri);
-                // request.fields['name'] = data['name'];
-                // request.fields['price'] = data['price'];
-                // request.fields['description'] = data['description'];
-                // request.fields['quantity'] = data['quantity'].toString();
-                // request.files.add(await http.MultipartFile.fromPath(
-                //   'image',
-                //   _image!.path,
-                //   filename: basename(_image!.path),
-                // ));
-                // request.headers.addAll({
-                //   'Authorization': 'Bearer $access_token',
-                //   'Accept': 'application/json',
-                //   'Content-Type': 'application/x-www-form-urlencoded'
-                // });
-                // print(request.files);
-                // // var response = await dio.post(
-                // //   uri.toString(),
-                // //   data: request.fields,
-                // //   options: Options(
-                // //     headers: request.headers,
-                // //     method: 'POST',
-                // //   ),
-                // //   onSendProgress: (int sent, int total) {
-                // //     print((sent / total * 100).toStringAsFixed(0) + '%');
-                // //   },
-                // // );
-                // var res = await request.send();
-                // // .then((response) {
-                //   // if (response.statusCode == 200) print("Uploaded!");
-                //   print(res.statusCode);
-                //   var response = await http.Response.fromStream(res);
-                //   print(response.body);
-
-                // });
+                try {
+                  var response = await dioRequest.post(
+                    uri.toString(),
+                    data: formData,
+                  );
+                  if (response.statusCode == 200 ||
+                      response.statusCode == 201) {
+                    print('item added');
+                    print(response.data);
+                    Navigator.of(context).pop(ViewDialogsAction.yes);
+                  }
+                } on DioError catch (e) {
+                  print(e.response);
+                  print(e.response.statusCode);
+                  print(e.response.data);
+                  dynamic server_errors =
+                      json.decode(e.response.toString())['message'];
+                  String message = '';
+                  for (var error in server_errors) {
+                    message += error.toString() + '. \n\n';
+                  }
+                  setState(() {
+                    errors = message;
+                    isLoading = false;
+                  });
+                }
               },
               child: const Text('Add'),
             ),
@@ -321,5 +297,102 @@ class ViewDialogs {
     );
   }
 
-  static Future<void> cameraImage() async {}
+  static addFolderDialog(BuildContext context, String? parent_id) async {
+    TextEditingController nameController = TextEditingController();
+    var _formKey;
+    bool isLoading = false;
+    String errors = '';
+    String name = '';
+
+    final action = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => StatefulBuilder(builder: (context, setState) {
+              return AlertDialog(
+                title: const Text('Add Folder'),
+                content: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Folder Name',
+                        ),
+                        controller: nameController,
+                        onChanged: (value) {
+                          name = value;
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Name Cannot be empty!';
+                          }
+                        },
+                        onSaved: (value) {
+                          name = value!;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      setState(() {
+                        errors = '';
+                        isLoading = true;
+                      });
+                      if (nameController.text.isEmpty) {
+                        setState(() {
+                          errors = 'Please enter folder name';
+                          isLoading = false;
+                        });
+                        return;
+                      }
+                      var uri = Uri.parse(apiUrl + 'gallery-items/folders');
+                      await apiService
+                          .postResponse(galleryItemsEndpoint + 'folders', {
+                        'name': name,
+                        'parent_id': parent_id,
+                      }).then((response) {
+                        print('folder added');
+                        print(response);
+                        Navigator.of(context).pop(ViewDialogsAction.yes);
+                      });
+                    },
+                    child: const Text('Add'),
+                  )
+                ],
+              );
+            }));
+    return action;
+  }
+
+  static showItemDetailsDialog(BuildContext context, GalleryItem item) {
+    Get.dialog(
+      AlertDialog(
+        title: Text(item.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(item.description ?? ''),
+            Text(item.price.toString()),
+            Text(item.quantity.toString()),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }

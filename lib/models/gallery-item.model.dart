@@ -2,7 +2,10 @@
 
 import 'dart:convert';
 
-GalleryItem galleryItemFromJson(String str) => GalleryItem.fromJson(json.decode(str));
+import 'package:younes_mobile/models/user.model.dart';
+
+GalleryItem galleryItemFromJson(String str) =>
+    GalleryItem.fromJson(json.decode(str));
 
 String galleryItemToJson(GalleryItem data) => json.encode(data.toJson());
 
@@ -17,44 +20,57 @@ class GalleryItem {
     required this.type,
     this.description,
     this.isActive = true,
+    this.isFavorite = true,
     required this.businessId,
     required this.createdById,
     this.updatedById,
+    this.createdBy,
+    this.updatedBy,
   });
 
-  String id;
+  int id;
   String name;
   double? price;
   int? quantity;
   String? image;
-  String? parentId;
+  int? parentId;
   String type;
   String? description;
   bool isActive;
-  String businessId;
-  String createdById;
-  String? updatedById;
+  bool isFavorite = false;
+  int businessId;
+  int createdById;
+  int? updatedById;
+  User? createdBy;
+  User? updatedBy;
 
   factory GalleryItem.fromJson(Map<String, dynamic> json) => GalleryItem(
         id: json["id"],
         name: json["name"],
-        price: json["price"] ? json['price'].toDouble(): null,
-        quantity: json["quantity"]? json['quantity']: null,
-        image: json["image"] ? json["image"] : null,
+        price: json['price'].toDouble(),
+        quantity: json['quantity'],
+        image: json["image"],
         parentId: json["parent_id"],
         type: json["type"],
         description: json["description"],
         isActive: json["is_active"],
+        isFavorite: json["is_favorite"],
         businessId: json["business_id"],
         createdById: json["created_by_id"],
         updatedById: json["updated_by_id"],
+        createdBy: json["created_by"] == null
+            ? null
+            : User.fromJson(json["created_by"]),
+        updatedBy: json["updated_by"] == null
+            ? null
+            : User.fromJson(json["updated_by"]),
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "price": price,
-        "quantity": quantity,
+        "price": price != null ? price.toString() : null,
+        "quantity": quantity != null ? quantity.toString() : null,
         "image": image == null ? null : image,
         "parent_id": parentId,
         "type": type,
@@ -62,6 +78,6 @@ class GalleryItem {
         "is_active": isActive,
         "business_id": businessId,
         "created_by_id": createdById,
-        "updated_by_id": updatedById,
+        "updated_by_id": updatedById
       };
 }
