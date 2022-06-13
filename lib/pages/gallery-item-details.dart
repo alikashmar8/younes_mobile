@@ -1,11 +1,18 @@
 // ignore_for_file: file_names, use_key_in_widget_constructors, unused_local_variable, unnecessary_null_comparison
 
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:share/share.dart';
 import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/models/gallery-item.model.dart';
 import 'package:younes_mobile/services/gallery-items.service.dart';
+import 'package:path_provider/path_provider.dart';
 
 class GalleryItemDetailsPage extends StatefulWidget {
   final GalleryItem item;
@@ -223,17 +230,35 @@ class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
                       child: Hero(
                         tag: item.id,
                         transitionOnUserGestures: true,
-                        child: Image(
-                          height: MediaQuery.of(context).size.height / 3 - 30,
-                          image: NetworkImage(
-                            item.image ?? "",
-                          ),
-                          fit: BoxFit.contain,
+                        child: CachedNetworkImage(
+                          imageUrl: item.image,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                  value: downloadProgress.progress),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            return const Icon(Icons.error);
+                          },
                           color: item.quantity! < 1
-                              ? Colors.black.withOpacity(0.7)
+                              ? Colors.black.withOpacity(0.5)
                               : null,
                           colorBlendMode: BlendMode.darken,
+                          fit: BoxFit.cover,
+                          filterQuality: FilterQuality.high,
                         ),
+
+                        // Image(
+                        //   height: MediaQuery.of(context).size.height / 3 - 30,
+                        //   image:
+                        //   fit: BoxFit.contain,
+                        //   color: item.quantity! < 1
+                        //       ? Colors.black.withOpacity(0.7)
+                        //       : null,
+                        //   colorBlendMode: BlendMode.darken,
+                        // ),
                       ),
                     ),
                     footer: Container(
@@ -366,18 +391,73 @@ class _GalleryItemDetailsPageState extends State<GalleryItemDetailsPage> {
                         elevation: 0.2,
                       ),
                     ),
-                    const IconButton(
-                        icon: Icon(
-                          Icons.share,
-                          color: Colors.red,
-                        ),
-                        onPressed: null),
-                    const IconButton(
-                        icon: Icon(
-                          Icons.favorite_border,
-                          color: Colors.red,
-                        ),
-                        onPressed: null),
+                    IconButton(
+                      icon: Icon(
+                        Icons.share,
+                        color: Colors.red,
+                      ),
+                      onPressed: () async {
+                        int index = 1;
+                        var imageList = <String>[];
+                        final directory =
+                            (await getExternalStorageDirectory())!.path;
+
+                        if (item.type == "file" && item.quantity! > 0) {
+                          String url;
+                          url = item.image!;
+
+                          var file =
+                              await DefaultCacheManager().getSingleFile(url);
+                          var data = await file.readAsBytes();
+                          Uint8List pngBytes = data.buffer.asUint8List();
+                          File imgFile =
+                              File('$directory/screenshot$index.png');
+                          imgFile.writeAsBytes(pngBytes);
+                          imageList.add(imgFile.path);
+                          index++;
+                        }
+                        Share.shareFiles(
+                          imageList,
+                          subject: 'Share',
+                          text: item.name,
+                        );
+                      },
+                    ),
+                    item.isFavorite
+                        ? IconButton(
+                            icon: const Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                            ),
+                            onPressed: () async {
+                              int status = await galleryItemsService
+                                  .unfavorite(item.id.toString());
+                              if (status <= 299) {
+                                setState(() {
+                                  item.isFavorite = false;
+                                });
+                              } else {
+                                print('Error unfavoriting item');
+                              }
+                            },
+                          )
+                        : IconButton(
+                            icon: const Icon(
+                              Icons.favorite_border,
+                              color: Colors.red,
+                            ),
+                            onPressed: () async {
+                              int status = await galleryItemsService
+                                  .makefavorite(item.id.toString());
+                              if (status <= 299) {
+                                setState(() {
+                                  item.isFavorite = true;
+                                });
+                              } else {
+                                print('Error unfavoriting item');
+                              }
+                            },
+                          ),
                   ],
                 ),
                 const Divider(

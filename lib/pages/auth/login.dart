@@ -3,6 +3,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:younes_mobile/models/user.model.dart';
 import 'package:younes_mobile/pages/home.dart';
 import 'package:younes_mobile/services/auth.service.dart';
 import '../../main.dart';
@@ -33,12 +35,12 @@ class LoginState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Log In"),
+          title: const Text("Log In"),
         ),
         body: Center(
           child: SingleChildScrollView(
             child: Container(
-              margin: new EdgeInsets.all(20.0),
+              margin: const EdgeInsets.all(20.0),
               child: Center(
                 child: Column(
                   children: <Widget>[
@@ -47,18 +49,18 @@ class LoginState extends State<LoginPage> {
                       color: Colors.lightBlue,
                       size: 100.0,
                     ),
-                    new SizedBox(height: 35.0),
+                    const SizedBox(height: 35.0),
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         hintText: 'Email',
                         contentPadding:
-                            EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                            const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(32.0)),
                       ),
                     ),
-                    new SizedBox(height: 20.0),
+                    const SizedBox(height: 20.0),
                     TextFormField(
                       autofocus: false,
                       controller: _passwordController,
@@ -66,7 +68,7 @@ class LoginState extends State<LoginPage> {
                       decoration: InputDecoration(
                         hintText: 'Password',
                         contentPadding:
-                            EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                            const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(32.0)),
                         suffixIcon: IconButton(
@@ -106,6 +108,8 @@ class LoginState extends State<LoginPage> {
                             var data = res;
                             var jwt = data['access_token'];
                             var user = data;
+                            Get.create(() => User.fromJson(user),
+                                permanent: true, tag: 'user');
                             if (data != null) {
                               storage.write(
                                   key: 'user', value: json.encode(user));

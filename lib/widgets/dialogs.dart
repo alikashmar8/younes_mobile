@@ -86,23 +86,44 @@ class ViewDialogs {
                       children: <Widget>[
                         Row(
                           children: [
-                            const Text("Add an Image"),
-                            const SizedBox(width: 10),
-                            IconButton(
-                              icon: const Icon(Icons.add_a_photo),
-                              iconSize: 30,
-                              color: Colors.blue,
-                              onPressed: () async {
-                                var image = await ImagePicker.pickImage(
-                                  source: ImageSource.gallery,
-                                  maxHeight: 240.0,
-                                  maxWidth: 240.0,
-                                );
-                                setState(() {
-                                  imageFile = image;
-                                });
-                              },
+                            FittedBox(
+                              child: Row(
+                                children: [
+                                  const Text("Add an Image"),
+                                  // const SizedBox(width: 5),
+                                  IconButton(
+                                    icon: const Icon(Icons.add_a_photo),
+                                    iconSize: 20,
+                                    color: Colors.blue,
+                                    onPressed: () async {
+                                      var image = await ImagePicker.pickImage(
+                                        source: ImageSource.gallery,
+                                        imageQuality: 80,
+                                      );
+                                      setState(() {
+                                        imageFile = image;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
+                            imageFile == null
+                                ? Container()
+                                : Center(
+                                    child: FittedBox(
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.2,
+                                        height: 50,
+                                        child: Image.file(
+                                          imageFile!,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                           ],
                         ),
                         TextFormField(

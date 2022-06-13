@@ -35,7 +35,6 @@ class _MyHomePageState extends State<HomePage> {
     listOfWidgets = [
       GalleryPage(null),
       FavoritesPage(),
-      const Text('page 3'),
       ProfilePage(),
     ];
   }
@@ -49,7 +48,6 @@ class _MyHomePageState extends State<HomePage> {
   var listOfIcons = [
     Icons.home_rounded,
     Icons.favorite_rounded,
-    Icons.settings_rounded,
     Icons.person_rounded,
   ];
 
@@ -82,9 +80,9 @@ class _MyHomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(50),
         ),
         child: ListView.builder(
-          itemCount: 4,
+          itemCount: 3,
           scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: size.width * .024),
+          padding: EdgeInsets.symmetric(horizontal: size.width * .124),
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {

@@ -1,10 +1,19 @@
 // ignore_for_file: type_init_formals, use_key_in_widget_constructors, must_be_immutable, prefer_const_constructors, non_constant_identifier_names, unused_field
 
+// import 'package:share/share.dart';
+import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
+
 import 'package:younes_mobile/models/gallery-item.model.dart';
 import 'package:younes_mobile/services/gallery-items.service.dart';
 import 'package:younes_mobile/widgets/dialogs.dart';
@@ -243,7 +252,40 @@ class GalleyWidgetState extends State<GalleryPage> {
           labelBackgroundColor: Colors.black,
         ),
         SpeedDialChild(
-          child: Icon(Icons.share, color: Colors.white),
+          child: IconButton(
+            icon: Icon(
+              Icons.share,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              int index = 1;
+              var imageList = <String>[];
+              final directory = (await getExternalStorageDirectory())!.path;
+
+              for (var item in items) {
+                if (item.type == "file" && item.quantity! > 0) {
+                  String url;
+                  if (item.image!.isNotEmpty) {
+                    url = item.image!;
+                  } else {
+                    url = '';
+                  }
+                  var file = await DefaultCacheManager().getSingleFile(url);
+                  var data = await file.readAsBytes();
+                  Uint8List pngBytes = data.buffer.asUint8List();
+                  File imgFile = File('$directory/screenshot$index.png');
+                  imgFile.writeAsBytes(pngBytes);
+                  imageList.add(imgFile.path);
+                  index++;
+                }
+              }
+              Share.shareFiles(
+                imageList,
+                subject: 'Share',
+                text: '',
+              );
+            },
+          ),
           backgroundColor: Colors.blue,
           onTap: () => print('Pressed Code'),
           label: 'Share Active Items',

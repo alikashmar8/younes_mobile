@@ -5,6 +5,7 @@ import 'package:younes_mobile/common/api.constants.dart';
 import 'package:younes_mobile/models/gallery-item.model.dart';
 import 'package:younes_mobile/pages/gallery-item-details.dart';
 import 'package:younes_mobile/services/gallery-items.service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 typedef void StringCallback(String val);
 
@@ -38,7 +39,6 @@ class _FileCardState extends State<FileCard> {
               ),
             ),
           ).then((value) => widget.callback(value));
-          ;
         },
         child: SizedBox(
             height: height * 0.3,
@@ -51,7 +51,6 @@ class _FileCardState extends State<FileCard> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Stack(
-                    // ignore: prefer_const_literals_to_create_immutables
                     children: <Widget>[
                       ClipRRect(
                         borderRadius: BorderRadius.only(
@@ -61,16 +60,27 @@ class _FileCardState extends State<FileCard> {
                           height: height * 0.17,
                           width: double.infinity,
                           child: Hero(
-                            tag: widget.item.id,
-                            child: Image.network(
-                              widget.item.image.toString(),
-                              fit: BoxFit.fill,
-                              color: widget.item.quantity! < 1
-                                  ? Colors.black.withOpacity(0.5)
-                                  : null,
-                              colorBlendMode: BlendMode.darken,
-                            ),
-                          ),
+                              tag: widget.item.id,
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    widget.item.image.toString(),
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) {
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                        value: downloadProgress.progress),
+                                  );
+                                },
+                                errorWidget: (context, url, error) {
+                                  return Icon(Icons.error);
+                                },
+                                color: widget.item.quantity! < 1
+                                    ? Colors.black.withOpacity(0.5)
+                                    : null,
+                                colorBlendMode: BlendMode.darken,
+                                fit: BoxFit.cover,
+                                filterQuality: FilterQuality.high,
+                              )),
                         ),
                       ),
                       Align(
