@@ -62,7 +62,8 @@ class _MyHomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Younes'),
+        automaticallyImplyLeading: false,
       ),
       body: Center(child: listOfWidgets[currentIndex]),
       bottomNavigationBar: Container(
