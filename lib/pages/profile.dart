@@ -23,39 +23,45 @@ class ProfileState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const SizedBox(
-                height: 80,
-                child: Icon(
+            SizedBox(
+                height: height * 0.1,
+                child: const Icon(
                   Icons.supervised_user_circle,
                   size: 90,
                   color: Colors.blue,
                 )),
-            //SizedBox(height: 12.0),
             Text(user.name,
                 style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 20.0,
                     color: Colors.orange)),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(height: 40.0),
-                _name(),
-                const SizedBox(height: 40.0),
-                _email(),
-                const SizedBox(height: 12.0),
-                //    _mobile(),
-                const SizedBox(height: 12.0),
-                //    _birthDate(),
-                const SizedBox(height: 12.0),
-                //    _gender(),
-                const SizedBox(height: 12.0),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  _name(user.name),
+                  const SizedBox(height: 20.0),
+                  _email(user.email),
+                  const SizedBox(height: 20.0),
+                  //    _mobile(),
+                  // const SizedBox(height: 12.0),
+                  //    _birthDate(),
+                  // const SizedBox(height: 12.0),
+                  //    _gender(),
+                  // const SizedBox(height: 12.0),
+                ],
+              ),
             ),
             //Container(
             //  width: double.infinity,
@@ -76,8 +82,6 @@ class ProfileState extends State<ProfilePage> {
 
             // child: Text('Profile:')),
             // Spacer(flex: 5,),
-            Text('Name: ${user.name}', style: const TextStyle(fontSize: 20)),
-            Text('Email: ${user.email}', style: const TextStyle(fontSize: 20)),
             MaterialButton(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
@@ -88,15 +92,8 @@ class ProfileState extends State<ProfilePage> {
                     style: TextStyle(color: Colors.white)),
                 onPressed: () async {
                   storage.delete(key: "access_token");
-                  Navigator.pop(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
-                }
-
-                //    () => Navigator.push(
-                //    context,
-                //    MaterialPageRoute(builder: (context) => LoginPage()),
-                //  ),
-                ),
+                  Navigator.popAndPushNamed(context, LoginPage.routeName);
+                }),
           ],
         ),
       ),
@@ -104,39 +101,37 @@ class ProfileState extends State<ProfilePage> {
   }
 }
 
-_name() {
-  User user;
+_name(String name) {
   return Row(children: <Widget>[
     _prefixIcon(Icons.people),
     Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const <Widget>[
-        Text('Name',
+      children: <Widget>[
+        const Text('Name',
             style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 15.0,
                 color: Colors.grey)),
-        SizedBox(height: 1),
-        //  Text(user.name),
+        const SizedBox(height: 1),
+        Text(name),
       ],
     )
   ]);
 }
 
-_email() {
-  User user;
+_email(String email) {
   return Row(children: <Widget>[
     _prefixIcon(Icons.email),
     Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const <Widget>[
-        Text('Email',
+      children: <Widget>[
+        const Text('Email',
             style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 15.0,
                 color: Colors.grey)),
-        SizedBox(height: 1),
-        // Text(user.email),
+        const SizedBox(height: 1),
+        Text(email),
       ],
     )
   ]);

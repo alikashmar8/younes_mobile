@@ -13,7 +13,6 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
-
 import 'package:younes_mobile/models/gallery-item.model.dart';
 import 'package:younes_mobile/services/gallery-items.service.dart';
 import 'package:younes_mobile/widgets/dialogs.dart';
@@ -36,7 +35,6 @@ class GalleyWidgetState extends State<GalleryPage> {
 
   List<GalleryItem> items = [];
 
-  String _string = '';
   GalleyWidgetState(this.parent_id);
   String? parent_id;
   GalleryItem? parent = null;
@@ -219,7 +217,10 @@ class GalleyWidgetState extends State<GalleryPage> {
                 isLoading = true;
                 items = [];
               });
-              getItems();
+              await getItems();
+              setState(() {
+                isLoading = false;
+              });
             }
           },
           label: 'Add Folder',

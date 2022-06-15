@@ -10,6 +10,8 @@ import 'package:younes_mobile/services/auth.service.dart';
 import '../../main.dart';
 
 class LoginPage extends StatefulWidget {
+  static String routeName = '/login';
+
   @override
   State<StatefulWidget> createState() => LoginState();
 
